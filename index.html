@@ -1,0 +1,2907 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="referrer" content="strict-origin-when-cross-origin">
+    <title>艾雪（M. C. Escher）『蜥蜴』平面鑲嵌之幾何與藝術</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700&family=Noto+Serif+TC:wght@500;600;700;900&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Noto Sans TC', sans-serif;
+            background-color: #f8f4ec;
+            background-image: 
+                radial-gradient(#d6c7b2 1px, transparent 1px),
+                radial-gradient(#e8dfd1 1px, #f8f4ec 1px);
+            background-size: 32px 32px;
+            background-position: 0 0, 16px 16px;
+        }
+        h1, h2, h3, .serif-text {
+            font-family: 'Noto Serif TC', serif;
+        }
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.35s ease-out forwards;
+        }
+        .tab-content.active {
+            display: block;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        /* Before/After Slider Styles */
+        .comparison-slider {
+            position: relative;
+            width: 100%;
+            aspect-ratio: 4 / 3;
+            overflow: hidden;
+            border-radius: 0.75rem;
+            user-select: none;
+            box-shadow: 0 12px 28px -6px rgba(68, 40, 14, 0.25);
+        }
+        .comparison-item {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+        .comparison-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            height: 100%;
+            width: 50%;
+            overflow: hidden;
+            border-right: 3px solid #f59e0b;
+        }
+        .slider-handle {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            left: 50%;
+            width: 44px;
+            margin-left: -22px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: ew-resize;
+            z-index: 20;
+        }
+        input[type=range].amber-range {
+            accent-color: #d97706;
+        }
+        @keyframes pulseGlow {
+            0%, 100% { r: 6px; opacity: 0.9; }
+            50% { r: 11px; opacity: 0.35; }
+        }
+        .rot-center-glow {
+            animation: pulseGlow 2s infinite ease-in-out;
+        }
+        /* Page 3 Interactive Coloring & Fullscreen Styles */
+        .playable-lizard {
+            cursor: pointer;
+            transition: filter 0.15s ease, opacity 0.15s ease;
+        }
+        .playable-lizard:hover {
+            filter: brightness(0.95) drop-shadow(0 0 6px rgba(245, 158, 11, 0.65));
+        }
+        @keyframes conflictPulse {
+            0%, 100% { stroke: #dc2626; stroke-width: 5.5px; filter: drop-shadow(0 0 8px rgba(220, 38, 38, 0.85)); }
+            50% { stroke: #fef08a; stroke-width: 3.5px; filter: drop-shadow(0 0 2px rgba(220, 38, 38, 0.4)); }
+        }
+        .lizard-conflict path.lizard-main-outline {
+            animation: conflictPulse 1s infinite ease-in-out;
+        }
+        @keyframes hintBlink {
+            0%, 100% { fill: #fde68a; }
+            50% { fill: #f59e0b; }
+        }
+        .lizard-hint path.lizard-main-outline {
+            animation: hintBlink 0.8s 3 ease-in-out;
+        }
+        .pseudo-fullscreen {
+            position: fixed !important;
+            inset: 0 !important;
+            width: 100vw !important;
+            height: 100vh !important;
+            max-width: none !important;
+            z-index: 9999 !important;
+            border-radius: 0 !important;
+            margin: 0 !important;
+            overflow-y: auto !important;
+            overflow-x: hidden !important;
+            -webkit-overflow-scrolling: touch;
+        }
+        #app-main-card:fullscreen,
+        #app-main-card:-webkit-full-screen,
+        #coloring-stage-wrapper:fullscreen,
+        #coloring-stage-wrapper:-webkit-full-screen {
+            width: 100vw !important;
+            height: 100vh !important;
+            max-width: none !important;
+            border-radius: 0 !important;
+            margin: 0 !important;
+            overflow-y: auto !important;
+            overflow-x: hidden !important;
+        }
+        .math-var {
+            font-family: 'Times New Roman', 'Noto Serif TC', serif;
+            font-style: italic;
+            font-weight: 600;
+        }
+    </style>
+    <script>
+        // Pre-define image load/error handlers in <head> so inline onload/onerror on <img> tags never fail
+        window.portraitFallbackTried = false;
+        window.handlePortraitError = function(imgEl) {
+            if (!window.portraitFallbackTried) {
+                window.portraitFallbackTried = true;
+                imgEl.src = 'image_86a89a.jpg';
+            } else {
+                imgEl.classList.add('hidden');
+                const fallback = document.getElementById('escher-svg-fallback');
+                if (fallback) fallback.classList.remove('hidden');
+            }
+        };
+
+        window.origPrintFallbackStep = 0;
+        window.handleOrigPrintError = function(imgEl) {
+            window.origPrintFallbackStep++;
+            if (window.origPrintFallbackStep === 1) {
+                imgEl.src = 'https://upload.wikimedia.org/wikipedia/en/9/96/Reptiles.jpg';
+            } else if (window.origPrintFallbackStep === 2) {
+                imgEl.src = 'https://mcescher.com/wp-content/uploads/2019/04/LW-327.jpg';
+            } else {
+                imgEl.classList.add('hidden');
+                const fallback = document.getElementById('escher-print-svg-fallback');
+                if (fallback) fallback.classList.remove('hidden');
+            }
+        };
+
+        window.showLoadedImg = function(type) {
+            if (type === 'outline') {
+                const img = document.getElementById('user-outline-img');
+                const svg = document.getElementById('svg-outline-showcase');
+                if (img) img.classList.remove('hidden');
+                if (svg) svg.classList.add('hidden');
+            } else if (type === 'colored') {
+                const img = document.getElementById('user-colored-img');
+                const svg = document.getElementById('svg-colored-showcase');
+                if (img) img.classList.remove('hidden');
+                if (svg) svg.classList.add('hidden');
+            }
+        };
+    </script>
+</head>
+<body class="text-stone-800 min-h-screen flex flex-col items-center py-6 sm:py-10 px-3 sm:px-6">
+
+    <!-- Main Exhibition Card -->
+    <div class="w-full max-w-6xl bg-white shadow-2xl rounded-2xl overflow-hidden border border-amber-200/80">
+        
+        <!-- Header Banner -->
+        <header class="bg-gradient-to-r from-stone-900 via-amber-950 to-stone-900 text-white relative overflow-hidden">
+            <div class="absolute inset-0 opacity-10 pointer-events-none" id="header-bg-pattern"></div>
+            
+            <!-- Top-Right Global Fullscreen Button -->
+            <div class="relative z-20 flex justify-end px-4 pt-3">
+                <button onclick="toggleAppFullscreen('app-main-card')" class="inline-flex items-center gap-1.5 bg-white/10 hover:bg-amber-600 text-amber-100 hover:text-white border border-amber-400/30 px-3 py-1.5 rounded-lg text-xs sm:text-sm font-medium backdrop-blur-sm transition shadow">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"></path></svg>
+                    <span id="global-fs-text">全螢幕瀏覽網頁</span>
+                </button>
+            </div>
+
+            <div class="relative z-10 px-6 pb-8 pt-2 md:pb-10 text-center max-w-4xl mx-auto">
+                <div class="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-amber-500/20 border border-amber-400/40 text-amber-300 text-xs sm:text-sm font-medium mb-3">
+                    <span>數學與視覺藝術跨領域互動展</span>
+                    <span>•</span>
+                    <span>Regular Division of the Plane No. 25</span>
+                </div>
+                <h1 class="text-2xl sm:text-4xl md:text-5xl font-bold tracking-wide mb-3 text-amber-50 drop-shadow">
+                    艾雪（M. C. Escher）『蜥蜴』平面鑲嵌藝術
+                </h1>
+                <p class="text-amber-200/90 text-sm sm:text-lg font-light">
+                    許志農教授指導 • 師大數學系沈玟妤設計 • 網頁製作：新北市林口國中李政憲老師
+                </p>
+            </div>
+
+            <!-- Navigation Tabs (3 Pages) -->
+            <nav class="relative z-10 grid grid-cols-1 sm:grid-cols-3 border-t border-amber-800/60 bg-stone-950/50 backdrop-blur-sm">
+                <button id="tab-btn-1" onclick="switchTab('page1')" class="py-4 px-3 text-center font-bold text-sm sm:text-base lg:text-lg transition-all duration-200 bg-amber-600 text-white shadow-inner flex items-center justify-center gap-2">
+                    <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path></svg>
+                    <span>第一頁：原作者與作品對照</span>
+                </button>
+                <button id="tab-btn-2" onclick="switchTab('page2')" class="py-4 px-3 text-center font-bold text-sm sm:text-base lg:text-lg transition-all duration-200 text-amber-200/80 hover:bg-white/10 hover:text-white flex items-center justify-center gap-2 border-t sm:border-t-0 sm:border-l border-amber-800/50">
+                    <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    <span>第二頁：幾何骨架與著色分析</span>
+                </button>
+                <button id="tab-btn-3" onclick="switchTab('page3')" class="py-4 px-3 text-center font-bold text-sm sm:text-base lg:text-lg transition-all duration-200 text-amber-200/80 hover:bg-white/10 hover:text-white flex items-center justify-center gap-2 border-t sm:border-t-0 sm:border-l border-amber-800/50">
+                    <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01"></path></svg>
+                    <span>第三頁：互動三色著色挑戰</span>
+                </button>
+            </nav>
+        </header>
+
+        <!-- Main Content Area -->
+        <main class="p-5 sm:p-8 md:p-10">
+
+            <!-- ================================================================= -->
+            <!-- PAGE 1: INTRODUCTION, ESCHER BIO, CREDITS & DUAL IMAGE COMPARISON -->
+            <!-- ================================================================= -->
+            <div id="page1" class="tab-content active space-y-10">
+                
+                <!-- Top Section: Escher Portrait + Bio + Design Credits -->
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch">
+                    
+                    <!-- Left Column: M. C. Escher Portrait Card (4 cols) -->
+                    <div class="lg:col-span-4 bg-stone-900 text-stone-100 rounded-2xl p-5 shadow-xl flex flex-col justify-between border border-stone-700">
+                        <div>
+                            <div class="relative rounded-xl overflow-hidden bg-stone-800 aspect-[4/5] mb-3 border border-stone-600 group">
+                                <img id="escher-portrait-img" 
+                                     src="https://upload.wikimedia.org/wikipedia/commons/4/4d/Maurits_Cornelis_Escher.jpg" 
+                                     onerror="handlePortraitError(this)"
+                                     alt="M. C. Escher 艾雪肖像" 
+                                     class="w-full h-full object-cover object-center grayscale contrast-125 transition-transform duration-500 group-hover:scale-105">
+                                
+                                <!-- SVG Artistic Portrait Fallback matching image_86a89a.jpg -->
+                                <div id="escher-svg-fallback" class="hidden absolute inset-0 bg-gradient-to-b from-stone-700 via-stone-900 to-black flex flex-col items-center justify-center p-4 text-center">
+                                    <svg viewBox="0 0 200 240" class="w-44 h-52 mb-2">
+                                        <defs>
+                                            <radialGradient id="faceLight" cx="65%" cy="35%" r="60%">
+                                                <stop offset="0%" stop-color="#f5f5f4"/>
+                                                <stop offset="55%" stop-color="#a8a29e"/>
+                                                <stop offset="100%" stop-color="#292524"/>
+                                            </radialGradient>
+                                        </defs>
+                                        <path d="M40,235 C45,190 75,180 105,180 C135,180 165,195 175,235 Z" fill="#1c1917"/>
+                                        <path d="M55,75 C50,115 58,155 78,178 C95,195 125,198 140,175 C155,152 162,115 155,78 Z" fill="url(#faceLight)"/>
+                                        <path d="M48,88 C38,55 60,25 102,22 C142,20 168,45 160,82 C150,62 128,55 98,58 C72,60 58,72 48,88 Z" fill="#f5f5f4"/>
+                                        <path d="M55,48 Q95,30 145,45" stroke="#d6d3d1" stroke-width="3" fill="none"/>
+                                        <path d="M62,36 Q105,20 138,34" stroke="#e7e5e4" stroke-width="2.5" fill="none"/>
+                                        <path d="M88,96 Q106,88 122,98" stroke="#f5f5f4" stroke-width="5" stroke-linecap="round" fill="none"/>
+                                        <path d="M134,97 Q148,90 160,96" stroke="#f5f5f4" stroke-width="4.5" stroke-linecap="round" fill="none"/>
+                                        <circle cx="106" cy="106" r="3.5" fill="#1c1917"/>
+                                        <circle cx="142" cy="106" r="3" fill="#1c1917"/>
+                                        <path d="M128,100 L142,135 L124,142" stroke="#44403c" stroke-width="3" fill="#d6d3d1"/>
+                                        <path d="M105,154 Q124,145 142,155" stroke="#e7e5e4" stroke-width="6" stroke-linecap="round" fill="none"/>
+                                        <path d="M108,172 C112,198 135,198 138,172 Z" fill="#f5f5f4"/>
+                                    </svg>
+                                    <span class="text-xs text-stone-400">M. C. Escher (1898–1972) 藝術肖像</span>
+                                </div>
+
+                                <div class="absolute bottom-2 right-2">
+                                    <label class="cursor-pointer bg-black/75 hover:bg-amber-600 text-white text-xs px-2.5 py-1.5 rounded-lg backdrop-blur-sm transition flex items-center gap-1 shadow">
+                                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                                        <span>更換肖像</span>
+                                        <input type="file" accept="image/*" class="hidden" onchange="loadCustomImage(event, 'escher-portrait-img', 'escher-svg-fallback')">
+                                    </label>
+                                </div>
+                            </div>
+
+                            <!-- Explicit Portrait Source Attribution -->
+                            <div class="mb-3 px-2.5 py-1.5 rounded-lg bg-stone-800/90 border border-stone-700 text-[11px] text-stone-300 leading-snug">
+                                <span class="text-amber-400 font-semibold">肖像圖片來源：</span>
+                                <a href="https://no.wikipedia.org/wiki/Maurits_Cornelis_Escher" target="_blank" rel="noopener noreferrer" class="underline hover:text-amber-300 break-all">
+                                    Wikipedia – Maurits Cornelis Escher (https://no.wikipedia.org/wiki/Maurits_Cornelis_Escher)
+                                </a>
+                            </div>
+
+                            <h3 class="text-xl font-bold text-amber-400 serif-text">莫里茲·柯尼利斯·艾雪</h3>
+                            <p class="text-sm text-stone-400 mb-2">Maurits Cornelis Escher (1898–1972)</p>
+                            <p class="text-sm text-stone-300 leading-relaxed">
+                                荷蘭版畫藝術大師，將平面結晶對稱群、多邊形等面積切割鑲嵌（Tessellation）與視覺錯覺推向藝術巔峰。
+                            </p>
+                        </div>
+                        <div class="mt-4 pt-3 border-t border-stone-700/80 text-xs text-stone-400 flex items-center justify-between">
+                            <span>代表作：《爬蟲類》(Reptiles, 1943)</span>
+                            <span class="text-amber-400 font-semibold">編號 No. 25 鑲嵌</span>
+                        </div>
+                    </div>
+
+                    <!-- Right Column: Artwork Origin, Original Lithograph Image, Credits & Source Links (8 cols) -->
+                    <div class="lg:col-span-8 flex flex-col justify-between space-y-6">
+                        
+                        <!-- Story & Direct Original Lithograph Showcase -->
+                        <div class="bg-amber-50/70 border border-amber-200 rounded-2xl p-6 sm:p-7 shadow-sm space-y-5">
+                            <div class="flex flex-wrap items-center justify-between gap-2 border-b border-amber-200 pb-3">
+                                <h2 class="text-2xl font-bold text-amber-950 serif-text flex items-center gap-2">
+                                    <span class="w-2 h-7 bg-amber-600 rounded-full inline-block"></span>
+                                    作品背景與艾雪《爬蟲類》(Reptiles, 1943) 原作
+                                </h2>
+                                <span class="text-xs font-semibold uppercase tracking-wider bg-amber-200/80 text-amber-900 px-3 py-1 rounded-full">
+                                    1939 規則平面分割 / 1943 石版畫原作
+                                </span>
+                            </div>
+                            
+                            <!-- Grid with Text + Direct Original Lithograph Image -->
+                            <div class="grid grid-cols-1 md:grid-cols-12 gap-5 items-center">
+                                <div class="md:col-span-7 space-y-3">
+                                    <p class="text-stone-700 leading-relaxed text-sm sm:text-base">
+                                        艾雪在造訪西班牙阿爾罕布拉宮後，潛心研究<strong>「平面的規則分割」（Regular Division of the Plane）</strong>。他在 1939 年完成的編號第 25 號水彩木刻手稿中，以<strong>正六邊形</strong>為基底，透過三組頂點的 <strong>120°</strong> 旋轉對稱裁切，創造出三色緊密咬合的<strong>「蜥蜴」鑲嵌圖樣</strong>。
+                                    </p>
+                                    <p class="text-stone-700 leading-relaxed text-sm sm:text-base">
+                                        1943 年，艾雪以此鑲嵌圖創作了舉世聞名的石版畫<strong>《爬蟲類》（<em>Reptiles</em>，如右圖）</strong>：素描本上的平面蜥蜴彷彿獲得生命般立體化爬出紙面，繞行過動物學書籍、三角板與正十二面體後，再度回到二維平面鑲嵌之中。
+                                    </p>
+
+                                    <!-- Official Source Citations -->
+                                    <div class="bg-white border border-amber-300 rounded-xl p-3.5 space-y-2 shadow-sm text-xs">
+                                        <div class="font-bold text-amber-800 uppercase tracking-wider">📌 作品原圖與作者資料引用出處：</div>
+                                        <div class="text-stone-600 break-all">
+                                            1. <strong>艾雪《Reptiles》(1943) 官方原圖出處</strong>：<br>
+                                            <a href="https://printondemand.mcescher.com/shop/m-c-escher-reptiles/" target="_blank" rel="noopener noreferrer" class="text-amber-700 hover:underline font-mono">https://printondemand.mcescher.com/shop/m-c-escher-reptiles/</a>
+                                        </div>
+                                        <div class="text-stone-600 break-all">
+                                            2. <strong>維基百科艾雪作者生平與肖像來源</strong>：<br>
+                                            <a href="https://no.wikipedia.org/wiki/Maurits_Cornelis_Escher" target="_blank" rel="noopener noreferrer" class="text-amber-700 hover:underline font-mono">https://no.wikipedia.org/wiki/Maurits_Cornelis_Escher</a>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Direct Embedded Original Lithograph "Reptiles" (1943) -->
+                                <div class="md:col-span-5 flex flex-col bg-stone-900 p-3 rounded-xl shadow-lg border border-stone-700 text-white">
+                                    <div class="relative w-full aspect-[334/385] rounded-lg overflow-hidden bg-stone-800 group">
+                                        <img id="escher-orig-print-img"
+                                             src="https://upload.wikimedia.org/wikipedia/en/0/0b/Escher_Reptiles.jpg"
+                                             referrerpolicy="no-referrer"
+                                             onerror="handleOrigPrintError(this)"
+                                             alt="M. C. Escher Reptiles (1943) 原作石版畫"
+                                             class="w-full h-full object-contain transition-transform duration-500 group-hover:scale-105">
+                                        <div id="escher-print-svg-fallback" class="hidden absolute inset-0 bg-stone-800 flex flex-col items-center justify-center p-4 text-center">
+                                            <div class="text-amber-300 font-bold text-sm mb-1">M. C. Escher《Reptiles》(1943)</div>
+                                            <p class="text-xs text-stone-300 mb-3">石版畫原作 (334 × 385 mm)</p>
+                                            <a href="https://printondemand.mcescher.com/shop/m-c-escher-reptiles/" target="_blank" rel="noopener noreferrer" class="px-3 py-1.5 bg-amber-600 text-white rounded-lg text-xs font-bold">點此開啟官方原圖</a>
+                                        </div>
+                                        <div class="absolute bottom-2 right-2">
+                                            <label class="cursor-pointer bg-black/75 hover:bg-amber-600 text-white text-[11px] px-2 py-1 rounded backdrop-blur-sm transition flex items-center gap-1 shadow">
+                                                <span>載入原作圖檔</span>
+                                                <input type="file" accept="image/*" class="hidden" onchange="loadCustomImage(event, 'escher-orig-print-img', 'escher-print-svg-fallback')">
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <div class="mt-2.5 text-[11px] text-stone-300 leading-snug">
+                                        <div class="font-bold text-amber-300">▲ 艾雪石版畫原作《Reptiles》(1943)</div>
+                                        <div>原圖來源：<a href="https://printondemand.mcescher.com/shop/m-c-escher-reptiles/" target="_blank" rel="noopener noreferrer" class="underline hover:text-amber-200">The M.C. Escher Company 官方典藏</a></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Highlighted Credits Banner: 艾雪 / 沈玟妤設計 / 許志農教授指導 / 李政憲老師網頁製作 -->
+                        <div class="bg-gradient-to-br from-amber-700 via-orange-700 to-amber-800 text-white rounded-2xl p-6 sm:p-7 shadow-lg relative overflow-hidden">
+                            <div class="absolute -right-8 -bottom-8 opacity-15 pointer-events-none">
+                                <svg class="w-48 h-48" viewBox="0 0 100 100" fill="currentColor">
+                                    <polygon points="50,5 90,27 90,72 50,95 10,72 10,27"/>
+                                </svg>
+                            </div>
+                            <div class="relative z-10">
+                                <h3 class="text-lg font-bold text-amber-200 mb-4 flex items-center gap-2">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path></svg>
+                                    <span>原作、幾何繪圖著色、學術指導與互動網頁製作團隊</span>
+                                </h3>
+                                <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-3.5">
+                                    <div class="bg-black/25 backdrop-blur-sm rounded-xl p-3.5 border border-white/15">
+                                        <div class="text-xs text-amber-200/90 mb-1">版畫原創作者</div>
+                                        <div class="text-base sm:text-lg font-bold tracking-wide">艾雪 (M. C. Escher)</div>
+                                    </div>
+                                    <div class="bg-white/15 backdrop-blur-sm rounded-xl p-3.5 border border-amber-300/40 shadow-inner">
+                                        <div class="text-xs text-amber-200 mb-1">繪圖著色設計</div>
+                                        <div class="text-base sm:text-lg font-bold tracking-wide text-yellow-200">師大數學系 沈玟妤 設計</div>
+                                    </div>
+                                    <div class="bg-white/15 backdrop-blur-sm rounded-xl p-3.5 border border-amber-300/40 shadow-inner">
+                                        <div class="text-xs text-amber-200 mb-1">學術與教學指導</div>
+                                        <div class="text-base sm:text-lg font-bold tracking-wide text-yellow-200">許志農 教授</div>
+                                    </div>
+                                    <div class="bg-white/20 backdrop-blur-sm rounded-xl p-3.5 border-2 border-yellow-300/60 shadow-md">
+                                        <div class="text-xs text-amber-100 mb-1">互動網頁製作</div>
+                                        <div class="text-base sm:text-lg font-bold tracking-wide text-yellow-200">新北市林口國中 李政憲 老師</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- Middle Section: Dual Artwork Showcase (Exact Geometry matching image_86bbe3.jpg & image_86b804.jpg) -->
+                <div class="bg-stone-50 border border-stone-200 rounded-2xl p-5 sm:p-7 shadow-inner space-y-6">
+                    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-stone-200 pb-4">
+                        <div>
+                            <h3 class="text-xl sm:text-2xl font-bold text-stone-800 serif-text">
+                                「蜥蜴」鑲嵌原始外框與三色著色成果對照
+                            </h3>
+                            <p class="text-sm text-stone-600 mt-1">
+                                依據許志農教授與沈玟妤同學設計之六步旋轉座標精確繪製（亦可點擊右方按鈕載入本機原圖檔或切換方向）
+                            </p>
+                        </div>
+
+                        <!-- View Mode, Orientation & Custom File Upload Controls -->
+                        <div class="flex flex-wrap items-center gap-2">
+                            <div class="inline-flex rounded-lg bg-stone-200 p-1">
+                                <button id="mode-side-btn" onclick="setDisplayMode('side')" class="px-3 py-1.5 rounded-md text-xs sm:text-sm font-semibold bg-white text-amber-800 shadow transition">
+                                    並排完整對照
+                                </button>
+                                <button id="mode-slider-btn" onclick="setDisplayMode('slider')" class="px-3 py-1.5 rounded-md text-xs sm:text-sm font-semibold text-stone-700 hover:text-stone-900 transition">
+                                    滑桿重疊比較
+                                </button>
+                            </div>
+
+                            <button id="orient-toggle-btn" onclick="togglePage1Orientation()" class="px-3 py-2 rounded-lg text-xs sm:text-sm font-medium bg-white border border-stone-300 hover:bg-stone-100 text-stone-700 transition">
+                                🔄 切換版面方向（橫向圖檔 / 影片方向）
+                            </button>
+
+                            <label class="cursor-pointer bg-amber-100 hover:bg-amber-200 text-amber-900 border border-amber-300 text-xs sm:text-sm font-medium px-3 py-2 rounded-lg transition flex items-center gap-1.5">
+                                <span>載入線稿圖</span>
+                                <input type="file" accept="image/*" class="hidden" onchange="uploadArtworkFile(event, 'outline')">
+                            </label>
+                            <label class="cursor-pointer bg-amber-100 hover:bg-amber-200 text-amber-900 border border-amber-300 text-xs sm:text-sm font-medium px-3 py-2 rounded-lg transition flex items-center gap-1.5">
+                                <span>載入著色圖</span>
+                                <input type="file" accept="image/*" class="hidden" onchange="uploadArtworkFile(event, 'colored')">
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Mode A: Side-by-Side View -->
+                    <div id="view-side-by-side" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <!-- Left Card: Original Black & White Outline with Double Orange/Brown Frame -->
+                        <div class="flex flex-col bg-white p-3 rounded-xl shadow-md border border-stone-200">
+                            <div class="relative w-full aspect-[4/3] rounded-lg overflow-hidden bg-white" id="card-outline-container">
+                                <img id="user-outline-img" src="image_86bbe3.jpg" class="w-full h-full object-contain hidden" onload="showLoadedImg('outline')" onerror="this.classList.add('hidden')">
+                                <div id="svg-outline-showcase" class="w-full h-full"></div>
+                            </div>
+                            <div class="mt-3 flex items-center justify-between px-1">
+                                <span class="font-bold text-stone-800 text-sm sm:text-base">▲ 圖一：蜥蜴鑲嵌原始外框線稿</span>
+                                <span class="text-xs bg-stone-100 text-stone-600 px-2 py-0.5 rounded">正六邊形 120° 旋轉骨架</span>
+                            </div>
+                        </div>
+
+                        <!-- Right Card: Three-Color Lizard Tessellation -->
+                        <div class="flex flex-col bg-white p-3 rounded-xl shadow-md border border-stone-200">
+                            <div class="relative w-full aspect-[4/3] rounded-lg overflow-hidden bg-white" id="card-colored-container">
+                                <img id="user-colored-img" src="image_86b804.jpg" class="w-full h-full object-contain hidden" onload="showLoadedImg('colored')" onerror="this.classList.add('hidden')">
+                                <div id="svg-colored-showcase" class="w-full h-full"></div>
+                            </div>
+                            <div class="mt-3 flex items-center justify-between px-1">
+                                <span class="font-bold text-amber-900 text-sm sm:text-base">▲ 圖二：師大數學系沈玟妤著色成果</span>
+                                <span class="text-xs bg-amber-100 text-amber-800 px-2 py-0.5 rounded font-medium">紅、黃、綠三色立體紋理</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Mode B: Interactive Before/After Slider Comparison -->
+                    <div id="view-slider-compare" class="hidden max-w-3xl mx-auto">
+                        <div id="comparison-box" class="comparison-slider border-2 border-amber-400">
+                            <div id="slider-colored-layer" class="comparison-item"></div>
+                            <div id="slider-outline-layer" class="comparison-overlay">
+                                <div id="slider-outline-inner" class="h-full"></div>
+                            </div>
+                            <div id="slider-handle-bar" class="slider-handle">
+                                <div class="w-10 h-10 rounded-full bg-amber-500 text-white shadow-xl border-2 border-white flex items-center justify-center font-bold text-sm">
+                                    ↔
+                                </div>
+                            </div>
+                        </div>
+                        <p class="text-center text-xs sm:text-sm text-stone-500 mt-3">
+                            💡 左右拖曳中央橘色滑桿，即時比對「原始幾何外框」與「三色立體著色」的對應關係
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Single Video Showcase & Cutting Diagram / Fine-Tuning Section -->
+                <div class="bg-stone-900 text-stone-100 rounded-2xl p-6 sm:p-8 shadow-xl border border-stone-700 space-y-8">
+                    
+                    <!-- Top Part: Single Featured Exhibition Video (HOoCEwvv7bU) with Multi-Mode Smooth Playback -->
+                    <div class="space-y-4">
+                        <div class="flex flex-col md:flex-row md:items-center justify-between gap-3 border-b border-stone-700 pb-4">
+                            <div>
+                                <span class="inline-block text-xs font-bold uppercase tracking-wider bg-amber-500/20 text-amber-300 border border-amber-400/30 px-3 py-1 rounded-full mb-2">
+                                    主展場影音導覽
+                                </span>
+                                <h3 class="text-xl sm:text-2xl font-bold text-white serif-text">
+                                    錯覺藝術大師艾雪的魔幻世界畫展－高雄市立美術館
+                                </h3>
+                                <p class="text-xs sm:text-sm text-stone-300 mt-1">
+                                    介紹艾雪版畫藝術精髓、《爬蟲類》(Reptiles) 立體循環構圖與魔幻視覺錯覺世界。
+                                </p>
+                            </div>
+                            <button onclick="switchTab('page2')" class="shrink-0 inline-flex items-center justify-center gap-2 bg-amber-500 hover:bg-amber-400 text-stone-950 font-bold px-4 py-2.5 rounded-xl shadow transition text-xs sm:text-sm">
+                                <span>前往第二頁：操作六步互動實驗室</span>
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"></path></svg>
+                            </button>
+                        </div>
+
+                        <!-- Single Centered Video Card with Smart Playback Modes -->
+                        <div class="max-w-4xl mx-auto bg-stone-800/90 rounded-2xl p-4 sm:p-5 border border-stone-700 space-y-4 shadow-lg">
+                            
+                            <!-- Playback Control & Mode Bar -->
+                            <div class="flex flex-wrap items-center justify-between gap-2 bg-stone-900/90 p-2.5 rounded-xl border border-stone-700">
+                                <div class="flex flex-wrap items-center gap-1.5">
+                                    <span class="text-xs font-bold text-amber-300 px-2">播放方式切換：</span>
+                                    <button id="vmode-poster-btn" onclick="switchVideoPlayMode('poster')" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-amber-600 text-white shadow transition">
+                                        🎬 封面預覽與點擊播放
+                                    </button>
+                                    <button id="vmode-embed-btn" onclick="switchVideoPlayMode('embed')" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-stone-800 hover:bg-stone-700 text-stone-200 border border-stone-600 transition">
+                                        ▶️ 網頁內嵌播放器
+                                    </button>
+                                    <button onclick="openYoutubePopupWindow('HOoCEwvv7bU')" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-emerald-700 hover:bg-emerald-600 text-white shadow transition flex items-center gap-1" title="解決預覽環境或本機開啟時的錯誤 153 限制">
+                                        <span>🗗 彈出獨立視窗播放（100% 順暢）</span>
+                                    </button>
+                                </div>
+
+                                <div class="flex items-center gap-2">
+                                    <label class="cursor-pointer px-3 py-1.5 rounded-lg text-xs font-bold bg-stone-800 hover:bg-amber-700 text-amber-200 hover:text-white border border-amber-500/40 transition flex items-center gap-1.5" title="若有下載影片 MP4 檔，可直接載入於網頁內離線播放">
+                                        <span>📂 載入本機 MP4 影片檔</span>
+                                        <input type="file" accept="video/*" class="hidden" onchange="loadLocalVideoFile(event)">
+                                    </label>
+                                    <a href="https://www.youtube.com/watch?v=HOoCEwvv7bU" target="_blank" rel="noopener noreferrer" class="text-xs text-amber-300 hover:underline font-mono px-2">
+                                        youtu.be/HOoCEwvv7bU ↗
+                                    </a>
+                                </div>
+                            </div>
+
+                            <!-- Video Stage Container (16:9) -->
+                            <div class="w-full aspect-video rounded-xl overflow-hidden shadow-2xl border border-stone-600 bg-black relative">
+                                
+                                <!-- Mode 1: High-Res Interactive Poster Cover (Default - Avoids immediate Error 153 screen) -->
+                                <div id="video-poster-view" class="w-full h-full relative group flex items-center justify-center">
+                                    <img src="https://i.ytimg.com/vi/HOoCEwvv7bU/hqdefault.jpg" 
+                                         alt="錯覺藝術大師艾雪的魔幻世界畫展－高雄市立美術館 影片預覽圖" 
+                                         class="w-full h-full object-cover opacity-80 group-hover:scale-105 group-hover:opacity-90 transition duration-500">
+                                    <div class="absolute inset-0 bg-gradient-to-t from-black/85 via-black/35 to-black/40"></div>
+                                    
+                                    <!-- Center Action Buttons -->
+                                    <div class="relative z-10 flex flex-col items-center text-center p-6 max-w-lg">
+                                        <div class="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-red-600 hover:bg-red-500 text-white flex items-center justify-center shadow-2xl mb-4 cursor-pointer transition transform hover:scale-110 ring-4 ring-white/30"
+                                             onclick="switchVideoPlayMode('embed')" title="嘗試在網頁內直接播放">
+                                            <svg class="w-9 h-9 ml-1" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                                        </div>
+                                        <h4 class="text-lg sm:text-xl font-bold text-white mb-2 drop-shadow">
+                                            錯覺藝術大師艾雪的魔幻世界畫展－高雄市立美術館
+                                        </h4>
+                                        <p class="text-xs sm:text-sm text-stone-200 mb-4">
+                                            點擊上方紅色按鈕可啟動網頁內嵌播放；若您目前在預覽沙盒或本機檔案（<code class="text-amber-300">file://</code>）開啟而遇到 YouTube 錯誤 153，請點擊下方按鈕即可順暢觀看：
+                                        </p>
+                                        <div class="flex flex-wrap items-center justify-center gap-3">
+                                            <button onclick="openYoutubePopupWindow('HOoCEwvv7bU')" class="px-4 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-stone-950 font-bold text-xs sm:text-sm shadow-lg transition flex items-center gap-1.5">
+                                                <span>🗗 彈出懸浮視窗直接播放</span>
+                                            </button>
+                                            <button onclick="switchVideoPlayMode('embed')" class="px-4 py-2.5 rounded-xl bg-white/15 hover:bg-white/25 text-white border border-white/30 font-semibold text-xs sm:text-sm backdrop-blur-sm transition">
+                                                ▶️ 嘗試網頁內嵌播放
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Mode 2: YouTube Iframe Embed Container -->
+                                <div id="video-embed-view" class="hidden w-full h-full"></div>
+
+                                <!-- Mode 3: Local HTML5 Video Player (For offline/classroom MP4 playback) -->
+                                <video id="video-local-view" class="hidden w-full h-full bg-black" controls playsinline></video>
+                            </div>
+
+                            <!-- Helpful Tip Note -->
+                            <div class="text-xs text-stone-400 flex flex-col sm:flex-row sm:items-center justify-between gap-2 px-1">
+                                <span>💡 <strong>為什麼有時會出現「錯誤 153」？</strong> YouTube 官方基於版權與安全策略，要求內嵌播放器必須具備正式網址（HTTP/HTTPS 網域來源）。在預覽沙盒或直接雙擊本機 HTML 檔（<code>file://</code>）時，建議使用「<strong>彈出獨立視窗播放</strong>」或透過本機伺服器開啟。</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Bottom Part: Interactive Cutting Blueprint Diagram & Vertex Fine-Tuning Tool (切割示意圖與頂點微調器) -->
+                    <div class="bg-stone-800/90 rounded-2xl p-5 sm:p-6 border border-amber-500/40 space-y-5">
+                        <div class="flex flex-col md:flex-row md:items-center justify-between gap-3 border-b border-stone-700 pb-3">
+                            <div>
+                                <span class="text-xs font-bold text-amber-300 uppercase tracking-wider">Cutting Blueprint & Interactive Vertex Fine-Tuner</span>
+                                <h4 class="text-lg sm:text-xl font-bold text-white serif-text mt-0.5">
+                                    📐 蜥蜴正六邊形「六步切割示意圖」與頂點互動細修工具
+                                </h4>
+                                <p class="text-xs sm:text-sm text-stone-300 mt-1">
+                                    下圖完整標示正六邊形頂點 <span class="math-var">V</span><sub>0</sub> ～ <span class="math-var">V</span><sub>5</sub> 與步驟 1 ～ 6 的<strong>「內部挖除區（彩色虛線）」</strong>與<strong>「繞頂點旋轉 120° 補出區（彩色實線）」</strong>。您可直接<strong>用滑鼠拖曳圖上的編號圓點</strong>即時細修蜥蜴外框，全站所有蜥蜴會自動同步更新並保持 <strong>100%</strong> 無縫密合！
+                                </p>
+                            </div>
+                            <div class="flex flex-wrap items-center gap-2 shrink-0">
+                                <button onclick="resetCustomLizardPts()" class="px-3 py-1.5 rounded-lg bg-stone-700 hover:bg-stone-600 text-stone-200 text-xs font-bold transition">
+                                    ↺ 還原預設座標
+                                </button>
+                                <button onclick="copyCustomLizardJSON()" class="px-3 py-1.5 rounded-lg bg-amber-500 hover:bg-amber-400 text-stone-950 text-xs font-bold transition shadow">
+                                    📋 複製目前微調座標數據
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-center">
+                            <!-- Left: Interactive Cutting Diagram SVG (7 cols) -->
+                            <div class="lg:col-span-7 flex flex-col items-center">
+                                <div class="w-full max-w-xl aspect-square bg-white rounded-xl border-2 border-amber-400 shadow-xl overflow-hidden relative">
+                                    <svg id="cutting-blueprint-svg" viewBox="-165 -155 330 310" class="w-full h-full select-none touch-none"></svg>
+                                    <div id="blueprint-copy-toast" class="hidden absolute top-3 right-3 bg-emerald-700 text-white text-xs font-bold px-3 py-1.5 rounded-lg shadow">
+                                        ✅ 已複製微調後的頂點座標！
+                                    </div>
+                                </div>
+                                <div class="flex flex-wrap items-center justify-center gap-4 mt-3 text-xs text-stone-300">
+                                    <label class="flex items-center gap-1.5 cursor-pointer">
+                                        <input type="checkbox" id="bp-toggle-in" checked onchange="renderCuttingBlueprint()" class="accent-amber-500">
+                                        <span>顯示內部挖除塊（虛線）</span>
+                                    </label>
+                                    <label class="flex items-center gap-1.5 cursor-pointer">
+                                        <input type="checkbox" id="bp-toggle-out" checked onchange="renderCuttingBlueprint()" class="accent-amber-500">
+                                        <span>顯示旋轉補出塊（實線色塊）</span>
+                                    </label>
+                                    <label class="flex items-center gap-1.5 cursor-pointer">
+                                        <input type="checkbox" id="bp-toggle-handles" checked onchange="renderCuttingBlueprint()" class="accent-amber-500">
+                                        <span>顯示可拖曳微調控制點</span>
+                                    </label>
+                                </div>
+                            </div>
+
+                            <!-- Right: Legend & Coordinate Inspector (5 cols) -->
+                            <div class="lg:col-span-5 space-y-3 text-xs text-stone-200">
+                                <div class="bg-stone-900/90 p-3.5 rounded-xl border border-stone-700 space-y-2">
+                                    <div class="font-bold text-amber-300 text-sm">🎨 六步切割區塊色碼對照說明：</div>
+                                    <div class="grid grid-cols-1 gap-1.5">
+                                        <div class="flex items-center gap-2"><span class="w-3.5 h-3.5 rounded bg-red-500 inline-block shrink-0"></span><span><strong>步驟 1（紅 C₁）</strong>：左頸凹槽挖除 <span class="text-amber-300 font-semibold">―(繞 <span class="math-var">V</span><sub>5</sub> 轉 −120°)→</span> 尖吻頭部</span></div>
+                                        <div class="flex items-center gap-2"><span class="w-3.5 h-3.5 rounded bg-blue-500 inline-block shrink-0"></span><span><strong>步驟 2（藍 C₂）</strong>：右腋下挖除 <span class="text-amber-300 font-semibold">―(繞 <span class="math-var">V</span><sub>1</sub> 轉 −120°)→</span> 左後腳掌（向右下）</span></div>
+                                        <div class="flex items-center gap-2"><span class="w-3.5 h-3.5 rounded bg-emerald-500 inline-block shrink-0"></span><span><strong>步驟 3（綠 C₃）</strong>：大腿內側挖除 <span class="text-amber-300 font-semibold">―(繞 <span class="math-var">V</span><sub>3</sub> 轉 −120°)→</span> 右後腳掌（向左下）</span></div>
+                                        <div class="flex items-center gap-2"><span class="w-3.5 h-3.5 rounded bg-orange-500 inline-block shrink-0"></span><span><strong>步驟 4（橘 C₄）</strong>：右頸與右臂內側挖除 <span class="text-amber-300 font-semibold">―(繞 <span class="math-var">V</span><sub>5</sub> 轉 +120°)→</span> 左前手掌</span></div>
+                                        <div class="flex items-center gap-2"><span class="w-3.5 h-3.5 rounded bg-purple-500 inline-block shrink-0"></span><span><strong>步驟 5（紫 C₅）</strong>：右邊下半三角挖除 <span class="text-amber-300 font-semibold">―(繞 <span class="math-var">V</span><sub>1</sub> 轉 +120°)→</span> 高舉的右前手掌</span></div>
+                                        <div class="flex items-center gap-2"><span class="w-3.5 h-3.5 rounded bg-teal-400 inline-block shrink-0"></span><span><strong>步驟 6（青 C₆）</strong>：左腰腹挖除 <span class="text-amber-300 font-semibold">―(繞 <span class="math-var">V</span><sub>3</sub> 轉 +120°)→</span> 彎曲長尾巴</span></div>
+                                    </div>
+                                </div>
+
+                                <div class="bg-stone-900/90 p-3.5 rounded-xl border border-stone-700 space-y-2">
+                                    <div class="flex items-center justify-between">
+                                        <span class="font-bold text-amber-300 text-sm">🔧 即時頂點座標檢視器 (R = 100)：</span>
+                                        <span id="bp-active-pt-label" class="text-amber-400 font-mono">請拖曳左側控制點</span>
+                                    </div>
+                                    <textarea id="bp-coords-textarea" rows="7" readonly class="w-full bg-stone-950 text-emerald-300 font-mono text-[11px] p-2.5 rounded-lg border border-stone-700 focus:outline-none"></textarea>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+
+            <!-- ================================================================= -->
+            <!-- PAGE 2: INTERACTIVE 6-STEP CUT-AND-ROTATE & TESSELLATION LABS     -->
+            <!-- ================================================================= -->
+            <div id="page2" class="tab-content space-y-10">
+
+                <!-- Interactive Lab Header -->
+                <div class="bg-amber-50 border border-amber-200 rounded-2xl p-5 sm:p-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
+                    <div>
+                        <span class="text-xs font-bold uppercase tracking-wider text-amber-700 bg-amber-200/70 px-2.5 py-1 rounded-md">Interactive Geometry & Coloring Lab</span>
+                        <h2 class="text-2xl sm:text-3xl font-bold text-stone-900 mt-1 serif-text">
+                            幾何骨架、六步裁切旋轉與三色鑲嵌互動分析
+                        </h2>
+                        <p class="text-stone-600 text-sm sm:text-base mt-1">
+                            100% 還原參考影片（00:20–01:36）中的正六邊形六步等面積裁切旋轉與三色密鋪過程。
+                        </p>
+                    </div>
+                    <div class="flex flex-wrap gap-2 shrink-0">
+                        <a href="#lab-six-steps" class="px-3 py-2 bg-white hover:bg-amber-100 text-amber-900 border border-amber-300 rounded-lg text-xs sm:text-sm font-semibold shadow-sm transition">1. 六步裁切旋轉動畫</a>
+                        <a href="#lab-skeleton" class="px-3 py-2 bg-white hover:bg-amber-100 text-amber-900 border border-amber-300 rounded-lg text-xs sm:text-sm font-semibold shadow-sm transition">2. 120°旋轉複製與骨架</a>
+                        <a href="#lab-coloring" class="px-3 py-2 bg-white hover:bg-amber-100 text-amber-900 border border-amber-300 rounded-lg text-xs sm:text-sm font-semibold shadow-sm transition">3. 三色著色與方向律動</a>
+                    </div>
+                </div>
+
+                <!-- =============================================================== -->
+                <!-- MODULE 1: 6-STEP GGB CUT & ROTATE ANIMATION (VIDEO 00:20-01:06) -->
+                <!-- =============================================================== -->
+                <section id="lab-six-steps" class="bg-white border border-stone-200 rounded-2xl shadow-lg overflow-hidden">
+                    <div class="bg-stone-900 text-white px-6 py-4 flex flex-wrap items-center justify-between gap-2">
+                        <div class="flex items-center gap-3">
+                            <span class="w-8 h-8 rounded-full bg-amber-500 text-stone-950 font-black flex items-center justify-center">1</span>
+                            <h3 class="text-lg sm:text-xl font-bold serif-text">正六邊形「六步裁切與 120° 旋轉」變形動畫（還原影片 00:20–01:06）</h3>
+                        </div>
+                        <span class="text-xs text-amber-300 bg-white/10 px-3 py-1 rounded-full">面積守恆：每一塊內部裁切多邊形皆繞頂點旋轉 120° 補至相鄰邊外側</span>
+                    </div>
+
+                    <div class="p-6 grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+                        <!-- Left SVG Interactive 6-Step Canvas (7 cols) -->
+                        <div class="lg:col-span-7 flex flex-col items-center">
+                            <div class="w-full max-w-xl aspect-square bg-[#d8e8f8] rounded-2xl border-2 border-amber-300 shadow-inner relative overflow-hidden flex items-center justify-center">
+                                <!-- Subtle sky-blue gradient background matching the reference video -->
+                                <div class="absolute inset-0 bg-gradient-to-br from-[#cce0f5] via-[#e2effb] to-[#c4dcf2] pointer-events-none"></div>
+                                <svg id="morph-svg" viewBox="-175 -175 350 350" class="w-full h-full relative z-10"></svg>
+                                
+                                <!-- Stage badge -->
+                                <div id="morph-stage-badge" class="absolute top-3 left-3 z-20 bg-stone-900/85 text-amber-300 text-xs sm:text-sm font-bold px-3.5 py-1.5 rounded-lg backdrop-blur-sm shadow">
+                                    步驟 7 / 7：完整著色與立體斑點紋理（對應影片 01:05）
+                                </div>
+                            </div>
+
+                            <!-- 6-Step Controls -->
+                            <div class="w-full max-w-xl mt-4 bg-amber-50/90 border border-amber-200 rounded-xl p-4 space-y-3">
+                                <div class="flex items-center justify-between gap-3">
+                                    <button id="morph-play-btn" onclick="toggleMorphPlay()" class="bg-amber-600 hover:bg-amber-700 text-white font-bold px-4 py-2 rounded-lg shadow transition flex items-center gap-1.5 text-sm shrink-0">
+                                        <span id="morph-play-icon">▶</span>
+                                        <span id="morph-play-text">自動播放完整六步動畫</span>
+                                    </button>
+                                    <input id="morph-slider" type="range" min="0" max="700" value="700" oninput="onMorphSliderChange(this.value)" class="w-full amber-range cursor-pointer">
+                                    <span id="morph-percent-label" class="font-mono font-bold text-amber-900 text-xs sm:text-sm w-16 text-right">Step 7</span>
+                                </div>
+
+                                <!-- Quick Step Jump Buttons matching exact video timestamps -->
+                                <div class="grid grid-cols-4 sm:grid-cols-8 gap-1.5 text-xs">
+                                    <button onclick="animateToStep(0)" class="py-1.5 px-1 rounded bg-white hover:bg-amber-100 border border-amber-200 font-semibold text-stone-700 transition">0. 六邊形</button>
+                                    <button onclick="animateToStep(100)" class="py-1.5 px-1 rounded bg-white hover:bg-amber-100 border border-amber-200 font-semibold text-red-700 transition">1. 頭部</button>
+                                    <button onclick="animateToStep(200)" class="py-1.5 px-1 rounded bg-white hover:bg-amber-100 border border-amber-200 font-semibold text-blue-700 transition">2. 左後腿</button>
+                                    <button onclick="animateToStep(300)" class="py-1.5 px-1 rounded bg-white hover:bg-amber-100 border border-amber-200 font-semibold text-emerald-700 transition">3. 右後腿</button>
+                                    <button onclick="animateToStep(400)" class="py-1.5 px-1 rounded bg-white hover:bg-amber-100 border border-amber-200 font-semibold text-red-700 transition">4. 左前腿</button>
+                                    <button onclick="animateToStep(500)" class="py-1.5 px-1 rounded bg-white hover:bg-amber-100 border border-amber-200 font-semibold text-blue-700 transition">5. 右前爪</button>
+                                    <button onclick="animateToStep(600)" class="py-1.5 px-1 rounded bg-white hover:bg-amber-100 border border-amber-200 font-semibold text-emerald-700 transition">6. 尾巴</button>
+                                    <button onclick="animateToStep(700)" class="py-1.5 px-1 rounded bg-amber-100 hover:bg-amber-200 border border-amber-400 font-bold text-amber-900 transition">7. 著色</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Right Mathematical Explanation of the 6 Steps (5 cols) -->
+                        <div class="lg:col-span-5 space-y-3">
+                            <div class="bg-orange-50/80 border-l-4 border-orange-600 p-3.5 rounded-r-xl">
+                                <h4 class="font-bold text-orange-950 text-base mb-1">影片 00:20–00:58 六步等面積裁切原理</h4>
+                                <p class="text-stone-700 text-xs sm:text-sm leading-relaxed">
+                                    正六邊形共有 6 條邊，兩兩相鄰配對並以 <strong>左臉頰 <span class="math-var">V</span><sub>5</sub>、右後膝 <span class="math-var">V</span><sub>1</sub>、下腳趾 <span class="math-var">V</span><sub>3</sub></strong> 三個頂點為 <strong>120°</strong> 旋轉中心。從一邊往內挖除的多邊形，繞頂點旋轉 <strong>120°</strong> 後恰好補在相鄰邊外側：
+                                </p>
+                            </div>
+
+                            <div class="space-y-2 text-xs sm:text-sm text-stone-700">
+                                <div onclick="animateToStep(100)" class="cursor-pointer flex items-start gap-2.5 p-2.5 rounded-xl bg-stone-50 hover:bg-red-50/70 border border-stone-200 transition">
+                                    <span class="w-5 h-5 rounded-full bg-red-600 text-white text-xs font-bold flex items-center justify-center shrink-0 mt-0.5">1</span>
+                                    <div><strong class="text-stone-900">步驟 1（00:21 蜥蜴頭部）：</strong>從左邊上半部（左頸凹槽）挖出多邊形，繞 <span class="math-var">V</span><sub>5</sub> 逆時針轉 120° 補至左上邊外側，形成<strong>「尖吻頭部」</strong>。</div>
+                                </div>
+                                <div onclick="animateToStep(200)" class="cursor-pointer flex items-start gap-2.5 p-2.5 rounded-xl bg-stone-50 hover:bg-blue-50/70 border border-stone-200 transition">
+                                    <span class="w-5 h-5 rounded-full bg-blue-600 text-white text-xs font-bold flex items-center justify-center shrink-0 mt-0.5">2</span>
+                                    <div><strong class="text-stone-900">步驟 2（00:25 左後腳掌）：</strong>從右上邊（右腋下凹槽）挖出靴狀多邊形，繞 <span class="math-var">V</span><sub>1</sub> 逆時針轉 120° 補至右邊外側，形成<strong>「向右伸展的後腳掌」</strong>。</div>
+                                </div>
+                                <div onclick="animateToStep(300)" class="cursor-pointer flex items-start gap-2.5 p-2.5 rounded-xl bg-stone-50 hover:bg-emerald-50/70 border border-stone-200 transition">
+                                    <span class="w-5 h-5 rounded-full bg-emerald-600 text-white text-xs font-bold flex items-center justify-center shrink-0 mt-0.5">3</span>
+                                    <div><strong class="text-stone-900">步驟 3（00:29 右後腳掌）：</strong>從右下邊（大腿內側凹槽）挖出多邊形，繞 <span class="math-var">V</span><sub>3</sub> 逆時針轉 120° 補至左下邊外側，形成<strong>「向下伸展的後腳掌」</strong>。</div>
+                                </div>
+                                <div onclick="animateToStep(400)" class="cursor-pointer flex items-start gap-2.5 p-2.5 rounded-xl bg-stone-50 hover:bg-red-50/70 border border-stone-200 transition">
+                                    <span class="w-5 h-5 rounded-full bg-red-600 text-white text-xs font-bold flex items-center justify-center shrink-0 mt-0.5">4</span>
+                                    <div><strong class="text-stone-900">步驟 4（00:34 左前手掌）：</strong>從左上邊右半部（右頸與右臂內側）挖出多邊形，繞 <span class="math-var">V</span><sub>5</sub> 順時針轉 120° 補至左邊下半部外側，形成<strong>「左前手掌」</strong>。</div>
+                                </div>
+                                <div onclick="animateToStep(500)" class="cursor-pointer flex items-start gap-2.5 p-2.5 rounded-xl bg-stone-50 hover:bg-blue-50/70 border border-stone-200 transition">
+                                    <span class="w-5 h-5 rounded-full bg-blue-600 text-white text-xs font-bold flex items-center justify-center shrink-0 mt-0.5">5</span>
+                                    <div><strong class="text-stone-900">步驟 5（00:41 右前手掌）：</strong>從右邊下半部挖出三角形，繞 <span class="math-var">V</span><sub>1</sub> 順時針轉 120° 補至右上邊頂端，形成高舉的<strong>「右前手掌」</strong>。</div>
+                                </div>
+                                <div onclick="animateToStep(600)" class="cursor-pointer flex items-start gap-2.5 p-2.5 rounded-xl bg-stone-50 hover:bg-emerald-50/70 border border-stone-200 transition">
+                                    <span class="w-5 h-5 rounded-full bg-emerald-600 text-white text-xs font-bold flex items-center justify-center shrink-0 mt-0.5">6</span>
+                                    <div><strong class="text-stone-900">步驟 6（00:48 彎曲長尾）：</strong>從左下邊上半部（左腰腹凹槽）挖出多邊形，繞 <span class="math-var">V</span><sub>3</sub> 順時針轉 120° 補至右下邊外側，形成<strong>「彎曲長尾巴」</strong>！</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- =============================================================== -->
+                <!-- MODULE 2: GEOMETRIC SKELETON & 120° ROTATION SYMMETRY DEMO      -->
+                <!-- =============================================================== -->
+                <section id="lab-skeleton" class="bg-white border border-stone-200 rounded-2xl shadow-lg overflow-hidden">
+                    <div class="bg-stone-900 text-white px-6 py-4 flex flex-wrap items-center justify-between gap-2">
+                        <div class="flex items-center gap-3">
+                            <span class="w-8 h-8 rounded-full bg-amber-500 text-stone-950 font-black flex items-center justify-center">2</span>
+                            <h3 class="text-lg sm:text-xl font-bold serif-text">幾何骨架透視與「120° 旋轉複製密鋪」動態演示（還原影片 01:07–01:36）</h3>
+                        </div>
+                        <span class="text-xs text-amber-300 bg-white/10 px-3 py-1 rounded-full">三方交會頂點：0°(紅) + 120°(黃) + 240°(綠) = 360° 無縫咬合</span>
+                    </div>
+
+                    <div class="p-6 grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+                        <!-- Left Description & Layer Switches (5 cols) -->
+                        <div class="lg:col-span-5 space-y-5 order-2 lg:order-1">
+                            <p class="text-stone-700 leading-relaxed text-sm sm:text-base">
+                                如影片 `00:55` 與 `01:07` 所示，當我們把<strong>紅色正六邊形虛線骨架</strong>疊加在蜥蜴身上時，可以清楚看見：每一隻蜥蜴的頭、手、腳與尾巴都精確受限於正六邊形的互補變形法則。
+                            </p>
+
+                            <!-- Interactive Layer Toggles -->
+                            <div class="bg-stone-50 border border-stone-200 rounded-xl p-4 space-y-3">
+                                <div class="text-xs font-bold uppercase tracking-wider text-stone-500 mb-1">圖層顯示開關（可自由勾選比對）</div>
+                                
+                                <label class="flex items-center justify-between p-2.5 bg-white rounded-lg border border-stone-200 cursor-pointer hover:border-amber-400 transition">
+                                    <span class="flex items-center gap-2.5 text-sm font-medium text-stone-800">
+                                        <span class="w-4 h-0.5 bg-red-600 border-b-2 border-dashed border-red-600 inline-block"></span>
+                                        顯示「正六邊形幾何虛線骨架」
+                                    </span>
+                                    <input type="checkbox" id="toggle-hex-grid" checked onchange="updateSkeletonView()" class="w-4 h-4 accent-amber-600">
+                                </label>
+
+                                <label class="flex items-center justify-between p-2.5 bg-white rounded-lg border border-stone-200 cursor-pointer hover:border-amber-400 transition">
+                                    <span class="flex items-center gap-2.5 text-sm font-medium text-stone-800">
+                                        <span class="w-3.5 h-3.5 rounded-full bg-amber-500 ring-4 ring-amber-200 inline-block"></span>
+                                        標示「120° 三方交會旋轉中心點」
+                                    </span>
+                                    <input type="checkbox" id="toggle-rot-centers" checked onchange="updateSkeletonView()" class="w-4 h-4 accent-amber-600">
+                                </label>
+
+                                <label class="flex items-center justify-between p-2.5 bg-white rounded-lg border border-stone-200 cursor-pointer hover:border-amber-400 transition">
+                                    <span class="flex items-center gap-2.5 text-sm font-medium text-stone-800">
+                                        <span class="w-3.5 h-3.5 rounded bg-gradient-to-br from-red-500 via-yellow-400 to-green-500 inline-block"></span>
+                                        顯示「三色蜥蜴立體紋理底圖」
+                                    </span>
+                                    <input type="checkbox" id="toggle-skeleton-color" checked onchange="updateSkeletonView()" class="w-4 h-4 accent-amber-600">
+                                </label>
+                            </div>
+
+                            <!-- 120 Degree Rotation Animation Trigger -->
+                            <div class="bg-amber-50 border border-amber-200 rounded-xl p-4 space-y-3">
+                                <h4 class="font-bold text-amber-950 text-sm sm:text-base flex items-center gap-2">
+                                    <svg class="w-5 h-5 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+                                    <span>動態實驗：繞頂點旋轉 120° 與 240° 密鋪</span>
+                                </h4>
+                                <p class="text-xs sm:text-sm text-stone-600">
+                                    點擊下方按鈕，還原影片 `01:07–01:25` 的旋轉複製過程：看<strong class="text-red-600">紅色蜥蜴</strong>繞著正六邊形頂點旋轉 <strong>120°</strong> 成為<strong class="text-yellow-600">黃色蜥蜴</strong>，再旋轉 <strong>120°</strong> 成為<strong class="text-green-700">綠色蜥蜴</strong>，三者緊密咬合並鋪滿平面！
+                                </p>
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                                    <button onclick="playRotationClusterDemo()" class="py-2.5 px-3 bg-amber-600 hover:bg-amber-700 text-white font-bold rounded-lg shadow transition flex items-center justify-center gap-1.5 text-xs sm:text-sm">
+                                        <span>🔄 演示三隻蜥蜴 120° 旋轉咬合</span>
+                                    </button>
+                                    <button onclick="updateSkeletonView()" class="py-2.5 px-3 bg-stone-800 hover:bg-stone-700 text-white font-bold rounded-lg shadow transition flex items-center justify-center gap-1.5 text-xs sm:text-sm">
+                                        <span>🧩 顯示完整平面密鋪與網格</span>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Right Interactive Skeleton Canvas (7 cols) -->
+                        <div class="lg:col-span-7 order-1 lg:order-2">
+                            <div class="w-full aspect-[4/3] bg-stone-900 rounded-2xl border-2 border-amber-300 shadow-inner relative overflow-hidden">
+                                <svg id="skeleton-svg" viewBox="0 0 640 480" class="w-full h-full"></svg>
+                                <div id="rotation-toast" class="absolute bottom-3 left-1/2 -translate-x-1/2 bg-stone-900/90 text-amber-200 border border-amber-400/40 px-4 py-1.5 rounded-full text-xs sm:text-sm font-medium backdrop-blur-sm pointer-events-none whitespace-nowrap">
+                                    紅色虛線為正六邊形骨架 • 發光圓點為 120° 旋轉中心
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- =============================================================== -->
+                <!-- MODULE 3: 3-COLORING, DIRECTIONAL RHYTHM & HOKKIEN TRIVIA       -->
+                <!-- =============================================================== -->
+                <section id="lab-coloring" class="bg-white border border-stone-200 rounded-2xl shadow-lg overflow-hidden">
+                    <div class="bg-stone-900 text-white px-6 py-4 flex flex-wrap items-center justify-between gap-2">
+                        <div class="flex items-center gap-3">
+                            <span class="w-8 h-8 rounded-full bg-amber-500 text-stone-950 font-black flex items-center justify-center">3</span>
+                            <h3 class="text-lg sm:text-xl font-bold serif-text">三色著色法（3-Coloring）與方向性律動分析</h3>
+                        </div>
+                        <span class="text-xs text-amber-300 bg-white/10 px-3 py-1 rounded-full">師大數學系 沈玟妤 著色設計解析</span>
+                    </div>
+
+                    <div class="p-6 grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+                        <!-- Left Interactive Coloring Canvas (7 cols) -->
+                        <div class="lg:col-span-7 space-y-4">
+                            <div class="w-full aspect-[4/3] bg-white rounded-2xl border-4 border-amber-500 shadow-md relative overflow-hidden">
+                                <svg id="coloring-svg" viewBox="0 0 640 480" class="w-full h-full"></svg>
+                            </div>
+
+                            <!-- Interactive Filter Buttons -->
+                            <div class="grid grid-cols-2 sm:grid-cols-5 gap-2">
+                                <button onclick="setColoringMode('outline')" id="cbtn-outline" class="py-2.5 px-3 rounded-xl border text-xs sm:text-sm font-bold transition bg-stone-100 text-stone-700 border-stone-300 hover:bg-stone-200">
+                                    1. 原始黑白線稿
+                                </button>
+                                <button onclick="setColoringMode('red')" id="cbtn-red" class="py-2.5 px-3 rounded-xl border text-xs sm:text-sm font-bold transition bg-red-50 text-red-800 border-red-200 hover:bg-red-100">
+                                    2. 突顯紅色群組 ↘
+                                </button>
+                                <button onclick="setColoringMode('yellow')" id="cbtn-yellow" class="py-2.5 px-3 rounded-xl border text-xs sm:text-sm font-bold transition bg-yellow-50 text-yellow-800 border-yellow-300 hover:bg-yellow-100">
+                                    3. 突顯黃色群組 ↙
+                                </button>
+                                <button onclick="setColoringMode('green')" id="cbtn-green" class="py-2.5 px-3 rounded-xl border text-xs sm:text-sm font-bold transition bg-emerald-50 text-emerald-800 border-emerald-200 hover:bg-emerald-100">
+                                    4. 突顯綠色群組 ←
+                                </button>
+                                <button onclick="setColoringMode('all')" id="cbtn-all" class="col-span-2 sm:col-span-1 py-2.5 px-3 rounded-xl border text-xs sm:text-sm font-bold transition bg-amber-600 text-white border-amber-700 shadow">
+                                    ✨ 完整三色與向量
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Right Visual Insights & Video Trivia (5 cols) -->
+                        <div class="lg:col-span-5 space-y-4">
+                            <div class="bg-amber-50 rounded-xl p-5 border border-amber-200 space-y-2.5">
+                                <h4 class="font-bold text-amber-950 text-lg serif-text">🎨 三色定理與立體紋理設計</h4>
+                                <p class="text-stone-700 text-sm leading-relaxed">
+                                    在正六邊形鑲嵌網格中，每個頂點皆由 <strong>3 隻蜥蜴</strong>交會（如三隻蜥蜴的頭、手肘與膝蓋交會點）。因此使用<strong>紅、黃、綠三種高對比色彩</strong>，能確保任何相鄰的兩隻蜥蜴皆不同色，讓原本錯綜複雜的黑白線稿瞬間立體分明！
+                                </p>
+                            </div>
+
+                            <div class="bg-stone-50 rounded-xl p-5 border border-stone-200 space-y-2.5">
+                                <h4 class="font-bold text-stone-900 text-lg serif-text">🧭 方向性律動（點擊左側按鈕體驗）</h4>
+                                <p class="text-stone-700 text-sm leading-relaxed">
+                                    同一種顏色的蜥蜴彼此之間僅有<strong>平行移動（Translation）</strong>，因此所有同色蜥蜴皆朝向完全相同的方向爬行；不同色蜥蜴之間則相差 <strong>120°</strong> 旋轉。
+                                </p>
+                            </div>
+
+                            <!-- Fun Trivia from Video 01:58 -->
+                            <div class="bg-gradient-to-r from-emerald-900 to-teal-900 text-white rounded-xl p-4 shadow-md border border-emerald-700">
+                                <div class="text-xs font-bold text-emerald-300 uppercase tracking-wider mb-1">💡 影片片尾彩蛋（01:58 趣味問答）</div>
+                                <div class="font-bold text-sm sm:text-base mb-2">請問「蜥蜴 / 壁虎」的閩南語是什麼呢？</div>
+                                <button onclick="document.getElementById('trivia-answer').classList.toggle('hidden')" class="text-xs bg-emerald-600 hover:bg-emerald-500 text-white font-semibold px-3 py-1.5 rounded-lg transition">
+                                    點擊揭曉答案
+                                </button>
+                                <div id="trivia-answer" class="hidden mt-2.5 pt-2.5 border-t border-emerald-700/80 text-xs sm:text-sm text-emerald-100 space-y-1">
+                                    <div>• <strong>台灣北部（濁水溪以北）</strong>：稱為「<strong>蝘蜓</strong>」（ián-thîng），會發出得得得的叫聲。</div>
+                                    <div>• <strong>台灣南部（濁水溪以南）</strong>：稱為「<strong>善蟲</strong>」（siān-thâng），常不發一語靜靜捕食蚊蟲。</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+            </div>
+
+            <!-- ================================================================= -->
+            <!-- PAGE 3: INTERACTIVE LIZARD TESSELLATION COLORING CHALLENGE        -->
+            <!-- ================================================================= -->
+            <div id="page3" class="tab-content space-y-6">
+
+                <!-- Top Intro & Rule Banner -->
+                <div class="bg-gradient-to-r from-amber-50 via-orange-50 to-amber-50 border border-amber-200 rounded-2xl p-5 sm:p-6 flex flex-col lg:flex-row lg:items-center justify-between gap-4 shadow-sm">
+                    <div class="space-y-1">
+                        <div class="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-amber-800 bg-amber-200/80 px-2.5 py-1 rounded-md">
+                            <span>Interactive 3-Coloring Challenge</span>
+                            <span>•</span>
+                            <span>同色不相鄰過關挑戰</span>
+                        </div>
+                        <h2 class="text-2xl sm:text-3xl font-bold text-stone-900 serif-text">
+                            艾雪『蜥蜴』原始外框互動著色實驗室
+                        </h2>
+                        <p class="text-stone-600 text-sm sm:text-base">
+                            點選空白蜥蜴身體即可上色或切換顏色！將畫面中所有完整蜥蜴塗滿<strong class="text-red-600">紅</strong>、<strong class="text-amber-600">黃</strong>、<strong class="text-emerald-700">綠</strong>三色，且<strong>相鄰的蜥蜴皆不同色</strong>，即可觸發過關煙火秀！
+                        </p>
+                    </div>
+
+                    <!-- Live Score & Status Badges -->
+                    <div class="flex flex-wrap items-center gap-3 shrink-0">
+                        <div class="bg-white border border-amber-300 rounded-xl px-4 py-2.5 shadow-sm text-center min-w-[120px]">
+                            <div class="text-xs text-stone-500 font-medium">已著色進度</div>
+                            <div id="game-progress-text" class="text-xl font-black text-amber-800 font-mono">0 / 14</div>
+                        </div>
+                        <div id="game-conflict-card" class="bg-white border border-stone-200 rounded-xl px-4 py-2.5 shadow-sm text-center min-w-[120px] transition">
+                            <div class="text-xs text-stone-500 font-medium">同色相鄰衝突</div>
+                            <div id="game-conflict-text" class="text-xl font-black text-emerald-600 font-mono">0 處</div>
+                        </div>
+                        <button onclick="toggleStageFullscreen()" class="bg-stone-900 hover:bg-amber-700 text-white font-bold px-4 py-3 rounded-xl shadow transition flex items-center gap-2 text-sm">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"></path></svg>
+                            <span>全螢幕著色模式</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Interactive Game Stage Container (Supports Fullscreen & Zoom/Pan) -->
+                <div id="coloring-stage-wrapper" class="bg-stone-900 rounded-2xl border-2 border-amber-300 shadow-2xl overflow-hidden flex flex-col">
+
+                    <!-- Control Toolbar -->
+                    <div class="bg-stone-800 text-stone-100 p-3 sm:p-4 border-b border-stone-700 flex flex-wrap items-center justify-between gap-3 z-20">
+                        
+                        <!-- 1. Range Selector: Small / Medium (Default) / Large -->
+                        <div class="flex items-center gap-2 bg-stone-900/90 p-1.5 rounded-xl border border-stone-700">
+                            <span class="text-xs font-bold text-amber-300 px-2">範圍大小：</span>
+                            <button id="range-btn-small" onclick="setGameRange('small')" class="px-3 py-1.5 rounded-lg text-xs sm:text-sm font-bold transition text-stone-300 hover:text-white">
+                                小（入門）
+                            </button>
+                            <button id="range-btn-medium" onclick="setGameRange('medium')" class="px-3 py-1.5 rounded-lg text-xs sm:text-sm font-bold transition bg-amber-600 text-white shadow">
+                                中（預設）
+                            </button>
+                            <button id="range-btn-large" onclick="setGameRange('large')" class="px-3 py-1.5 rounded-lg text-xs sm:text-sm font-bold transition text-stone-300 hover:text-white">
+                                大（挑戰）
+                            </button>
+                        </div>
+
+                        <!-- 2. Color Brush & Click Mode Selector -->
+                        <div class="flex flex-wrap items-center gap-1.5 bg-stone-900/90 p-1.5 rounded-xl border border-stone-700">
+                            <span class="text-xs font-bold text-amber-300 px-2">點選變色模式：</span>
+                            <button id="brush-btn-cycle" onclick="setGameBrush('cycle')" class="px-2.5 py-1.5 rounded-lg text-xs font-bold transition bg-amber-600 text-white shadow flex items-center gap-1" title="連續點擊蜥蜴即可依序切換：紅 → 黃 → 綠 → 空白">
+                                <span>🔄 循環變色</span>
+                            </button>
+                            <button id="brush-btn-red" onclick="setGameBrush('red')" class="px-2.5 py-1.5 rounded-lg text-xs font-bold transition bg-stone-800 text-red-300 hover:bg-red-950 border border-red-500/40 flex items-center gap-1.5">
+                                <span class="w-3 h-3 rounded-full bg-[#ff2a14] inline-block border border-white"></span>
+                                <span>紅蜥蜴</span>
+                            </button>
+                            <button id="brush-btn-yellow" onclick="setGameBrush('yellow')" class="px-2.5 py-1.5 rounded-lg text-xs font-bold transition bg-stone-800 text-yellow-200 hover:bg-yellow-950 border border-yellow-400/40 flex items-center gap-1.5">
+                                <span class="w-3 h-3 rounded-full bg-[#facc15] inline-block border border-white"></span>
+                                <span>黃蜥蜴</span>
+                            </button>
+                            <button id="brush-btn-green" onclick="setGameBrush('green')" class="px-2.5 py-1.5 rounded-lg text-xs font-bold transition bg-stone-800 text-emerald-300 hover:bg-emerald-950 border border-emerald-400/40 flex items-center gap-1.5">
+                                <span class="w-3 h-3 rounded-full bg-[#5bb86d] inline-block border border-white"></span>
+                                <span>綠蜥蜴</span>
+                            </button>
+                            <button id="brush-btn-erase" onclick="setGameBrush('erase')" class="px-2.5 py-1.5 rounded-lg text-xs font-bold transition bg-stone-800 text-stone-300 hover:bg-stone-700 border border-stone-600 flex items-center gap-1">
+                                <span>🧹 擦除</span>
+                            </button>
+                        </div>
+
+                        <!-- 3. Zoom & Pan Controls -->
+                        <div class="flex items-center gap-1.5 bg-stone-900/90 p-1.5 rounded-xl border border-stone-700">
+                            <span class="text-xs font-bold text-amber-300 px-1.5">縮放底圖：</span>
+                            <button onclick="adjustGameZoom(-0.2)" class="w-7 h-7 rounded-lg bg-stone-800 hover:bg-stone-700 text-white font-bold flex items-center justify-center border border-stone-600" title="縮小底圖">−</button>
+                            <input id="game-zoom-slider" type="range" min="50" max="250" value="100" oninput="setGameZoom(this.value / 100)" class="w-20 sm:w-24 amber-range cursor-pointer">
+                            <button onclick="adjustGameZoom(0.2)" class="w-7 h-7 rounded-lg bg-stone-800 hover:bg-stone-700 text-white font-bold flex items-center justify-center border border-stone-600" title="放大底圖">+</button>
+                            <span id="game-zoom-label" class="text-xs font-mono text-amber-300 w-11 text-center">100%</span>
+                            <button onclick="resetGameZoomPan()" class="px-2 py-1 rounded-lg bg-stone-800 hover:bg-stone-700 text-xs text-stone-200 border border-stone-600" title="重置縮放與位置">重置</button>
+                        </div>
+
+                        <!-- 4. Helper Actions & Fullscreen Toggle -->
+                        <div class="flex flex-wrap items-center gap-2">
+                            <label class="flex items-center gap-1.5 text-xs bg-stone-900/90 px-2.5 py-1.5 rounded-xl border border-stone-700 cursor-pointer select-none">
+                                <input type="checkbox" id="toggle-game-details" checked onchange="renderGameBoard()" class="accent-amber-500">
+                                <span>著色時顯示斑點與眼睛</span>
+                            </label>
+                            <button onclick="highlightGameHint()" class="px-2.5 py-1.5 rounded-xl bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-400/40 text-xs font-bold transition">
+                                💡 提示未完成區
+                            </button>
+                            <button onclick="resetGameBoard()" class="px-2.5 py-1.5 rounded-xl bg-stone-700 hover:bg-stone-600 text-stone-200 text-xs font-bold transition">
+                                ↺ 清空重玩
+                            </button>
+                            <button onclick="toggleStageFullscreen()" id="stage-fs-btn" class="px-3 py-1.5 rounded-xl bg-amber-600 hover:bg-amber-500 text-white text-xs font-bold transition flex items-center gap-1 shadow">
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"></path></svg>
+                                <span id="stage-fs-text">全螢幕</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Dedicated Status Bar (Moved out of canvas to prevent blocking interaction on mobile) -->
+                    <div id="game-status-bar" class="bg-stone-950 border-b border-stone-700 px-3 sm:px-4 py-2 sm:py-2.5 flex flex-wrap items-center justify-between gap-2 z-20 transition-colors duration-300">
+                        <div id="game-status-text" class="text-amber-300 text-xs sm:text-sm font-medium drop-shadow-sm">
+                            💡 點選任意白色蜥蜴即可塗色；按住 Shift 或於放大時右鍵／雙指拖曳可平移畫布，滾輪可縮放。
+                        </div>
+                        <div class="text-stone-400 text-[11px] sm:text-xs hidden sm:block">
+                            虛線外圍為邊界裁切蜥蜴（自動同步色彩）
+                        </div>
+                    </div>
+
+                    <!-- Interactive Canvas Viewport -->
+                    <div id="game-viewport" class="relative w-full aspect-[4/3] bg-stone-950 overflow-hidden select-none flex-1 flex items-center justify-center">
+                        
+                        <!-- Zoomable & Pannable Transform Layer -->
+                        <div id="game-transform-layer" class="w-full h-full flex items-center justify-center transition-transform duration-75 ease-out origin-center">
+                            <svg id="game-board-svg" viewBox="0 0 800 600" class="w-full h-full max-h-full drop-shadow-2xl"></svg>
+                        </div>
+
+                        <!-- Fireworks Overlay Canvas -->
+                        <canvas id="fireworks-canvas" class="absolute inset-0 w-full h-full pointer-events-none z-30 hidden"></canvas>
+
+                        <!-- Victory Celebration Modal Banner -->
+                        <div id="victory-banner" class="hidden absolute inset-x-0 top-6 z-40 flex justify-center px-4 pointer-events-none">
+                            <div class="bg-stone-900/95 border-2 border-amber-400 text-white px-6 py-4 rounded-2xl shadow-2xl backdrop-blur-md flex flex-col sm:flex-row items-center gap-4 pointer-events-auto animate-bounce">
+                                <div class="text-center sm:text-left">
+                                    <div class="text-amber-400 font-black text-lg sm:text-xl flex items-center justify-center sm:justify-start gap-2">
+                                        <span>🎆 恭喜過關！完美達成艾雪三色鑲嵌！</span>
+                                    </div>
+                                    <p class="text-xs sm:text-sm text-stone-300 mt-0.5">
+                                        所有蜥蜴皆已完成著色，且完全符合「同色不相鄰」的數學平面鑲嵌幾何律！
+                                    </p>
+                                </div>
+                                <div class="flex items-center gap-2 shrink-0">
+                                    <button onclick="startFireworksCelebration()" class="px-3.5 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-stone-950 font-bold text-xs sm:text-sm shadow transition">
+                                        🎇 再放一次煙火
+                                    </button>
+                                    <button onclick="closeVictoryBanner()" class="px-3 py-2 rounded-xl bg-stone-700 hover:bg-stone-600 text-stone-200 font-semibold text-xs sm:text-sm transition">
+                                        繼續欣賞作品
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+        </main>
+
+        <!-- Footer -->
+        <footer class="bg-stone-900 text-stone-400 px-6 py-5 text-center text-xs sm:text-sm border-t border-stone-800 flex flex-col sm:flex-row items-center justify-between gap-2">
+            <div>
+                原作：M. C. Escher《Reptiles》(1943) ｜ 繪圖著色：<strong class="text-amber-300">師大數學系 沈玟妤 設計</strong> ｜ 指導老師：<strong class="text-amber-300">許志農 教授</strong> ｜ 網頁製作：<strong class="text-amber-300">新北市林口國中 李政憲 老師</strong>
+            </div>
+            <div>
+                數學與藝術互動教學展示系統
+            </div>
+        </footer>
+    </div>
+
+    <!-- ===================================================================== -->
+    <!-- JAVASCRIPT: EXACT VIDEO-ACCURATE ESCHER LIZARD GEOMETRY & ANIMATIONS  -->
+    <!-- ===================================================================== -->
+    <script>
+        /**
+         * EDITABLE MASTER CONTROL POINTS FOR THE 6 CUT POLYGONS (R = 100)
+         * Allows live interactive fine-tuning on the Cutting Blueprint Diagram!
+         */
+        const DEFAULT_LIZARD_MASTER_PTS = {
+            c1_out: [
+                [-86.6025, -50.0],    // V5: Left cheek corner (fixed pivot)
+                [-72.0, -94.0],       // P1_1: Left brow ridge above left eye
+                [-63.0, -105.0],      // P1_2: Pointed snout apex
+                [-24.0, -86.1435]     // M_50: Right brow corner
+            ],
+            c4_in: [
+                [-24.0, -86.1435],    // M_50: Right brow corner
+                [-16.0, -43.0],       // P4_1: Right cheek / neck base
+                [-5.0, -44.0],        // P4_2: Right shoulder notch
+                [20.0, -63.0],        // P4_3: Inner elbow of raised right arm
+                [13.0, -74.0],        // P4_4: Inner wrist of raised right arm
+                [-1.0, -76.0],        // P4_5: Bottom-left thumb corner of raised right hand
+                [0.0, -100.0]         // V0: Top-left corner of raised right hand (fixed vertex)
+            ],
+            c2_in: [
+                [86.6025, -50.0],     // V1: Pointed knee of right-extending leg (fixed pivot)
+                [59.5, -28.0],        // P2_1: Upper thigh curve
+                [45.0, -4.0],         // P2_2: Deep hip / groin corner
+                [19.0, -29.0],        // P2_3: Deep right armpit corner
+                [51.9615, -70.0]      // M_01: Outer elbow of raised right arm
+            ],
+            c5_out: [
+                [51.9615, -70.0],     // M_01: Outer elbow of raised right arm
+                [21.0, -100.0],       // P5_1: Top-right corner of raised right hand
+                [0.0, -100.0]         // V0: Top-left corner of raised right hand (fixed vertex)
+            ],
+            c3_in: [
+                [0.0, 100.0],         // V3: Top-right toe corner of bottom-left foot (fixed pivot)
+                [-27.0, 77.0],        // P3_1: Inner ankle / knee bend
+                [-7.0, 61.0],         // P3_2: Under-thigh corner
+                [10.5, 67.0],         // P3_3: Inner thigh bend
+                [36.0, 54.0],         // P3_4: Crotch corner
+                [48.4974, 72.0]       // M_23: Inner tail base
+            ],
+            c6_out: [
+                [48.4974, 72.0],      // M_23: Inner tail base
+                [63.0, 103.5],        // P6_1: Inner tail curve
+                [57.0, 126.0],        // P6_2: Sharp bottom tip of tail
+                [82.5, 99.0],         // P6_3: Lower-right outer tail corner
+                [86.6025, 50.0]       // V2: Outer mid-bend of tail (fixed vertex)
+            ]
+        };
+
+        let customLizardMasterPts = JSON.parse(JSON.stringify(DEFAULT_LIZARD_MASTER_PTS));
+
+        const SQRT3_2 = Math.sqrt(3) / 2; // 0.8660254
+
+        function degToRad(deg) {
+            return deg * Math.PI / 180;
+        }
+
+        function rotatePt(pt, pivot, angleDeg) {
+            const rad = degToRad(angleDeg);
+            const c = Math.cos(rad);
+            const s = Math.sin(rad);
+            const dx = pt[0] - pivot[0];
+            const dy = pt[1] - pivot[1];
+            return [
+                pivot[0] + dx * c - dy * s,
+                pivot[1] + dx * s + dy * c
+            ];
+        }
+
+        function scalePts(pts, factor) {
+            return pts.map(p => [p[0] * factor, p[1] * factor]);
+        }
+
+        function ptsToSvgPath(pts, close = true) {
+            return pts.map((p, i) => `${i === 0 ? 'M' : 'L'} ${p[0].toFixed(2)} ${p[1].toFixed(2)}`).join(' ') + (close ? ' Z' : '');
+        }
+
+        /**
+         * Returns the exact vertices, the 6 cut polygons (for the 6-step animation),
+         * and the complete closed lizard outline path for a given hexagon radius R.
+         * Uses customLizardMasterPts so interactive adjustments update everything live!
+         */
+        function getExactVideoLizardData(R = 100) {
+            const s = R / 100;
+
+            // 6 Hexagon vertices (Pointy-top orientation matching video 00:20 & 00:55)
+            const V0 = [0 * s, -100 * s];
+            const V1 = [86.6025 * s, -50 * s];
+            const V2 = [86.6025 * s, 50 * s];
+            const V3 = [0 * s, 100 * s];
+            const V4 = [-86.6025 * s, 50 * s];
+            const V5_pt = [-86.6025 * s, -50 * s];
+            const V = [V0, V1, V2, V3, V4, V5_pt];
+
+            // 1. PAIR AROUND V5 (-86.6025, -50)
+            const c1_out = scalePts(customLizardMasterPts.c1_out, s);
+            const c1_in = c1_out.map(p => rotatePt(p, V5_pt, +120));
+
+            const c4_in = scalePts(customLizardMasterPts.c4_in, s);
+            const c4_out = c4_in.map(p => rotatePt(p, V5_pt, +120));
+
+            // 2. PAIR AROUND V1 (86.6025, -50)
+            const c2_in = scalePts(customLizardMasterPts.c2_in, s);
+            const c2_out = c2_in.map(p => rotatePt(p, V1, -120));
+
+            const c5_out = scalePts(customLizardMasterPts.c5_out, s);
+            const c5_in = c5_out.map(p => rotatePt(p, V1, -120));
+
+            // 3. PAIR AROUND V3 (0, 100)
+            const c3_in = scalePts(customLizardMasterPts.c3_in, s);
+            const c3_out = c3_in.map(p => rotatePt(p, V3, -120));
+
+            const c6_out = scalePts(customLizardMasterPts.c6_out, s);
+            const c6_in = c6_out.map(p => rotatePt(p, V3, -120));
+
+            // -------------------------------------------------------------------
+            // Assemble the Complete Clockwise Boundary of the Lizard:
+            //   1. V5 -> M_50 (c1_out)   + M_50 -> V0 (c4_in)
+            //   2. V0 -> M_01 (rev c5_out)+ M_01 -> V1 (rev c2_in)
+            //   3. V1 -> M_12 (c2_out)   + M_12 -> V2 (c5_in)
+            //   4. V2 -> M_23 (rev c6_out)+ M_23 -> V3 (rev c3_in)
+            //   5. V3 -> M_34 (c3_out)   + M_34 -> V4 (c6_in)
+            //   6. V4 -> M_45 (rev c4_out)+ M_45 -> V5 (rev c1_in)
+            // -------------------------------------------------------------------
+            const rev = arr => [...arr].reverse();
+
+            const fullOutlinePts = [
+                ...c1_out.slice(0, -1),
+                ...c4_in.slice(0, -1),
+                ...rev(c5_out).slice(0, -1),
+                ...rev(c2_in).slice(0, -1),
+                ...c2_out.slice(0, -1),
+                ...c5_in.slice(0, -1),
+                ...rev(c6_out).slice(0, -1),
+                ...rev(c3_in).slice(0, -1),
+                ...c3_out.slice(0, -1),
+                ...c6_in.slice(0, -1),
+                ...rev(c4_out).slice(0, -1),
+                ...rev(c1_in).slice(0, -1)
+            ];
+
+            // Helper to build the clean progressive outline for any step progress array stepProgs[0..5]
+            function buildIntermediateBodyPath(stepProgs) {
+                const seg1_out = stepProgs[0] >= 0.999 ? c1_out : [V5_pt, c1_out[c1_out.length - 1]];
+                const seg4_in  = stepProgs[3] > 0.001  ? c4_in  : [c4_in[0], V0];
+                const seg5_out = stepProgs[4] >= 0.999 ? rev(c5_out) : [V0, c5_out[0]];
+                const seg2_in  = stepProgs[1] > 0.001  ? rev(c2_in)  : [c2_in[c2_in.length - 1], V1];
+                const seg2_out = stepProgs[1] >= 0.999 ? c2_out : [V1, c2_out[c2_out.length - 1]];
+                const seg5_in  = stepProgs[4] > 0.001  ? c5_in  : [c5_in[0], V2];
+                const seg6_out = stepProgs[5] >= 0.999 ? rev(c6_out) : [V2, c6_out[0]];
+                const seg3_in  = stepProgs[2] > 0.001  ? rev(c3_in)  : [c3_in[c3_in.length - 1], V3];
+                const seg3_out = stepProgs[2] >= 0.999 ? c3_out : [V3, c3_out[c3_out.length - 1]];
+                const seg6_in  = stepProgs[5] > 0.001  ? c6_in  : [c6_in[0], V4];
+                const seg4_out = stepProgs[3] >= 0.999 ? rev(c4_out) : [V4, c4_out[0]];
+                const seg1_in  = stepProgs[0] > 0.001  ? rev(c1_in)  : [c1_in[c1_in.length - 1], V5_pt];
+
+                const pts = [
+                    ...seg1_out.slice(0, -1),
+                    ...seg4_in.slice(0, -1),
+                    ...seg5_out.slice(0, -1),
+                    ...seg2_in.slice(0, -1),
+                    ...seg2_out.slice(0, -1),
+                    ...seg5_in.slice(0, -1),
+                    ...seg6_out.slice(0, -1),
+                    ...seg3_in.slice(0, -1),
+                    ...seg3_out.slice(0, -1),
+                    ...seg6_in.slice(0, -1),
+                    ...seg4_out.slice(0, -1),
+                    ...seg1_in.slice(0, -1)
+                ];
+                return ptsToSvgPath(pts, true);
+            }
+
+            // Steps 1, 2, 3 rotate by -120° (CCW); Steps 4, 5, 6 rotate by +120° (CW)
+            const cuts = [
+                { step: 1, name: '頭部',     pivot: V5_pt, angle: -120, inPts: c1_in, outPts: c1_out, color: '#ef4444' },
+                { step: 2, name: '左後腳掌', pivot: V1,    angle: -120, inPts: c2_in, outPts: c2_out, color: '#3b82f6' },
+                { step: 3, name: '右後腳掌', pivot: V3,    angle: -120, inPts: c3_in, outPts: c3_out, color: '#10b981' },
+                { step: 4, name: '左前手掌', pivot: V5_pt, angle: +120, inPts: c4_in, outPts: c4_out, color: '#f97316' },
+                { step: 5, name: '右前手掌', pivot: V1,    angle: +120, inPts: c5_in, outPts: c5_out, color: '#a855f7' },
+                { step: 6, name: '彎曲長尾', pivot: V3,    angle: +120, inPts: c6_in, outPts: c6_out, color: '#14b8a6' }
+            ];
+
+            return {
+                V,
+                cuts,
+                fullOutlinePts,
+                pathData: ptsToSvgPath(fullOutlinePts, true),
+                hexPathData: ptsToSvgPath(V, true),
+                buildIntermediateBodyPath
+            };
+        }
+
+        // =====================================================================
+        // LIZARD COLOR PALETTES, INTERNAL DETAILS & TESSELLATION RENDERER
+        // =====================================================================
+        const LIZARD_STYLES = {
+            red: {
+                fill: '#ff2a14',
+                shade: '#c81406',
+                highlight: '#ff8566',
+                spot: '#ff9666',
+                spineFill: '#ff9e80',
+                spineStroke: '#6b0902',
+                eyeBg: '#fca5a5',
+                vecColor: '#991b1b'
+            },
+            yellow: {
+                fill: '#facc15',
+                shade: '#ca8a04',
+                highlight: '#fef08a',
+                spot: '#fef9c3',
+                spineFill: '#fef08a',
+                spineStroke: '#713f12',
+                eyeBg: '#fef9c3',
+                vecColor: '#854d0e'
+            },
+            green: {
+                fill: '#5bb86d',
+                shade: '#2f7a40',
+                highlight: '#a7f3d0',
+                spot: '#bbf7d0',
+                spineFill: '#a7f3d0',
+                spineStroke: '#14532d',
+                eyeBg: '#dcfce7',
+                vecColor: '#166534'
+            }
+        };
+
+        /**
+         * Renders the 3D shading, dorsal double-line spine, spots, toes, and eyes
+         * matching Shen Wen-Yu's colored lizard design (image_846362.jpg & image_86b804.jpg).
+         */
+        function getLizardInternalDetailsSVG(R = 100, colorKey = 'red', opacity = 1, showVector = false) {
+            if (opacity <= 0.01) return '';
+            const s = R / 100;
+            const st = LIZARD_STYLES[colorKey] || LIZARD_STYLES.red;
+
+            // Oval spots across the back and thighs
+            const spots = [
+                [-18, -22, 5.5, 4.0, -20], [-6, -24, 6.0, 4.2, 15], [7, -18, 5.2, 3.8, 30],
+                [-24, -10, 5.8, 4.0, -10], [-11, -11, 6.5, 4.5, 25], [2, -8, 6.2, 4.2, 35], [14, -6, 5.0, 3.5, 40],
+                [-28, 2, 5.0, 3.5, -15],   [-15, 2, 6.5, 4.5, 20],   [-1, 5, 6.8, 4.6, 30],  [12, 6, 5.8, 4.0, 25],
+                [-20, 14, 5.5, 3.8, 10],   [-6, 17, 6.0, 4.2, 35],   [8, 18, 6.2, 4.2, 40],  [21, 18, 5.0, 3.6, 45],
+                [-3, 28, 5.2, 3.6, 35],    [12, 30, 5.8, 4.0, 45],   [25, 31, 5.0, 3.5, 50],
+                [24, 43, 4.8, 3.2, 50],    [36, 46, 4.5, 3.0, 55],
+                // Limb spots
+                [-46, 12, 4.2, 2.8, -25],  [-38, 17, 3.8, 2.5, -20],
+                [18, -42, 4.0, 2.6, -45],  [25, -48, 3.5, 2.4, -40],
+                [54, -16, 4.8, 3.2, -55],  [48, -6, 4.2, 2.8, -50],
+                [-18, 44, 4.2, 2.8, -35],  [-26, 52, 3.8, 2.5, -30]
+            ];
+
+            const spotsHTML = spots.map(([cx, cy, rx, ry, rot]) =>
+                `<ellipse cx="${(cx * s).toFixed(1)}" cy="${(cy * s).toFixed(1)}" rx="${(rx * s).toFixed(1)}" ry="${(ry * s).toFixed(1)}" transform="rotate(${rot}, ${(cx * s).toFixed(1)}, ${(cy * s).toFixed(1)})" fill="${st.spot}" opacity="0.72"/>`
+            ).join('');
+
+            const vectorHTML = showVector ? `
+                <g opacity="0.95">
+                    <line x1="${(-48 * s).toFixed(1)}" y1="${(-76 * s).toFixed(1)}" x2="${(42 * s).toFixed(1)}" y2="${(68 * s).toFixed(1)}" stroke="#ffffff" stroke-width="${(5.5 * s).toFixed(1)}" stroke-linecap="round"/>
+                    <line x1="${(-48 * s).toFixed(1)}" y1="${(-76 * s).toFixed(1)}" x2="${(42 * s).toFixed(1)}" y2="${(68 * s).toFixed(1)}" stroke="${st.vecColor}" stroke-width="${(3.2 * s).toFixed(1)}" stroke-linecap="round"/>
+                    <polygon points="${(-56 * s).toFixed(1)},${(-89 * s).toFixed(1)} ${(-38 * s).toFixed(1)},${(-78 * s).toFixed(1)} ${(-52 * s).toFixed(1)},${(-68 * s).toFixed(1)}" fill="${st.vecColor}" stroke="#ffffff" stroke-width="${(1.2 * s).toFixed(1)}"/>
+                </g>
+            ` : '';
+
+            return `
+                <g opacity="${opacity.toFixed(2)}" pointer-events="none">
+                    <!-- Soft 3D Shading along Limbs & Torso -->
+                    <path d="M ${(-58 * s).toFixed(1)} ${(-88 * s).toFixed(1)} Q ${(-45 * s).toFixed(1)} ${(-55 * s).toFixed(1)} ${(-28 * s).toFixed(1)} ${(-32 * s).toFixed(1)}" stroke="${st.shade}" stroke-width="${(10 * s).toFixed(1)}" stroke-linecap="round" fill="none" opacity="0.42"/>
+                    <path d="M ${(-32 * s).toFixed(1)} ${(22 * s).toFixed(1)} L ${(-64 * s).toFixed(1)} ${(8 * s).toFixed(1)} L ${(-88 * s).toFixed(1)} ${(20 * s).toFixed(1)}" stroke="${st.shade}" stroke-width="${(8 * s).toFixed(1)}" stroke-linecap="round" stroke-linejoin="round" fill="none" opacity="0.38"/>
+                    <path d="M ${(32 * s).toFixed(1)} ${(8 * s).toFixed(1)} L ${(66 * s).toFixed(1)} ${(-28 * s).toFixed(1)} L ${(105 * s).toFixed(1)} ${(-18 * s).toFixed(1)}" stroke="${st.shade}" stroke-width="${(9 * s).toFixed(1)}" stroke-linecap="round" stroke-linejoin="round" fill="none" opacity="0.38"/>
+                    <path d="M ${(-8 * s).toFixed(1)} ${(35 * s).toFixed(1)} L ${(-42 * s).toFixed(1)} ${(56 * s).toFixed(1)} L ${(-24 * s).toFixed(1)} ${(95 * s).toFixed(1)}" stroke="${st.shade}" stroke-width="${(9 * s).toFixed(1)}" stroke-linecap="round" stroke-linejoin="round" fill="none" opacity="0.38"/>
+
+                    <!-- Dorsal Spot Pattern -->
+                    ${spotsHTML}
+
+                    <!-- Eyes on Both Sides of the Pointed Snout -->
+                    <!-- Left Eye -->
+                    <g transform="translate(${(-67 * s).toFixed(1)}, ${(-66 * s).toFixed(1)}) rotate(-68)">
+                        <ellipse cx="0" cy="0" rx="${(8.5 * s).toFixed(1)}" ry="${(4.2 * s).toFixed(1)}" fill="${st.eyeBg}" stroke="#111111" stroke-width="${(1.8 * s).toFixed(1)}"/>
+                        <circle cx="${(1.2 * s).toFixed(1)}" cy="0" r="${(2.6 * s).toFixed(1)}" fill="#111111"/>
+                        <circle cx="${(2.0 * s).toFixed(1)}" cy="${(-0.8 * s).toFixed(1)}" r="${(1.0 * s).toFixed(1)}" fill="#ffffff"/>
+                    </g>
+                    <!-- Right Eye -->
+                    <g transform="translate(${(-38 * s).toFixed(1)}, ${(-82 * s).toFixed(1)}) rotate(38)">
+                        <ellipse cx="0" cy="0" rx="${(8.5 * s).toFixed(1)}" ry="${(4.2 * s).toFixed(1)}" fill="${st.eyeBg}" stroke="#111111" stroke-width="${(1.8 * s).toFixed(1)}"/>
+                        <circle cx="${(-1.2 * s).toFixed(1)}" cy="0" r="${(2.6 * s).toFixed(1)}" fill="#111111"/>
+                        <circle cx="${(-0.5 * s).toFixed(1)}" cy="${(-0.8 * s).toFixed(1)}" r="${(1.0 * s).toFixed(1)}" fill="#ffffff"/>
+                    </g>
+
+                    <!-- Dorsal Double-Line Spine Ridge from Snout to Tail Tip -->
+                    <path d="M ${(-55 * s).toFixed(1)} ${(-86 * s).toFixed(1)} C ${(-32 * s).toFixed(1)} ${(-42 * s).toFixed(1)}, ${(8 * s).toFixed(1)} ${(16 * s).toFixed(1)}, ${(64 * s).toFixed(1)} ${(92 * s).toFixed(1)} C ${(72 * s).toFixed(1)} ${(104 * s).toFixed(1)}, ${(66 * s).toFixed(1)} ${(115 * s).toFixed(1)}, ${(59 * s).toFixed(1)} ${(122 * s).toFixed(1)}"
+                          stroke="${st.spineFill}" stroke-width="${(7.2 * s).toFixed(1)}" stroke-linecap="round" fill="none" opacity="0.88"/>
+                    <path d="M ${(-57 * s).toFixed(1)} ${(-85 * s).toFixed(1)} C ${(-35 * s).toFixed(1)} ${(-40 * s).toFixed(1)}, ${(5 * s).toFixed(1)} ${(18 * s).toFixed(1)}, ${(61 * s).toFixed(1)} ${(94 * s).toFixed(1)}"
+                          stroke="${st.spineStroke}" stroke-width="${(1.6 * s).toFixed(1)}" stroke-linecap="round" fill="none"/>
+                    <path d="M ${(-52 * s).toFixed(1)} ${(-87 * s).toFixed(1)} C ${(-29 * s).toFixed(1)} ${(-44 * s).toFixed(1)}, ${(11 * s).toFixed(1)} ${(14 * s).toFixed(1)}, ${(67 * s).toFixed(1)} ${(90 * s).toFixed(1)}"
+                          stroke="${st.spineStroke}" stroke-width="${(1.6 * s).toFixed(1)}" stroke-linecap="round" fill="none"/>
+
+                    <!-- Toe Crease Lines & Joint Folds -->
+                    <g stroke="#111111" stroke-width="${(1.6 * s).toFixed(1)}" stroke-linecap="round" fill="none" opacity="0.85">
+                        <!-- Raised Right Forehand Toes -->
+                        <line x1="${(5 * s).toFixed(1)}" y1="${(-99 * s).toFixed(1)}" x2="${(8 * s).toFixed(1)}" y2="${(-86 * s).toFixed(1)}"/>
+                        <line x1="${(12 * s).toFixed(1)}" y1="${(-99 * s).toFixed(1)}" x2="${(14 * s).toFixed(1)}" y2="${(-85 * s).toFixed(1)}"/>
+                        <!-- Left Forehand Toes -->
+                        <line x1="${(-108 * s).toFixed(1)}" y1="${(12 * s).toFixed(1)}" x2="${(-95 * s).toFixed(1)}" y2="${(16 * s).toFixed(1)}"/>
+                        <line x1="${(-109 * s).toFixed(1)}" y1="${(22 * s).toFixed(1)}" x2="${(-96 * s).toFixed(1)}" y2="${(23 * s).toFixed(1)}"/>
+                        <!-- Right-Extending Hind Foot Toes -->
+                        <line x1="${(122 * s).toFixed(1)}" y1="${(-24 * s).toFixed(1)}" x2="${(106 * s).toFixed(1)}" y2="${(-22 * s).toFixed(1)}"/>
+                        <line x1="${(119 * s).toFixed(1)}" y1="${(-14 * s).toFixed(1)}" x2="${(104 * s).toFixed(1)}" y2="${(-14 * s).toFixed(1)}"/>
+                        <!-- Bottom-Left Hind Foot Toes -->
+                        <line x1="${(-12 * s).toFixed(1)}" y1="${(116 * s).toFixed(1)}" x2="${(-16 * s).toFixed(1)}" y2="${(100 * s).toFixed(1)}"/>
+                        <line x1="${(-22 * s).toFixed(1)}" y1="${(114 * s).toFixed(1)}" x2="${(-24 * s).toFixed(1)}" y2="${(98 * s).toFixed(1)}"/>
+                        <!-- Shoulder / Hip Crease Lines -->
+                        <path d="M ${(-28 * s).toFixed(1)} ${(-28 * s).toFixed(1)} Q ${(-36 * s).toFixed(1)} ${(-12 * s).toFixed(1)} ${(-32 * s).toFixed(1)} ${(4 * s).toFixed(1)}"/>
+                        <path d="M ${(22 * s).toFixed(1)} ${(4 * s).toFixed(1)} Q ${(34 * s).toFixed(1)} ${(16 * s).toFixed(1)} ${(44 * s).toFixed(1)} ${(12 * s).toFixed(1)}"/>
+                    </g>
+
+                    ${vectorHTML}
+                </g>
+            `;
+        }
+
+        /**
+         * Renders a full Escher Lizard Tessellation SVG for any container and mode.
+         */
+        function renderTessellationSVG({
+            width = 640,
+            height = 480,
+            R = 68,
+            mode = 'colored', // 'outline' | 'colored' | 'red' | 'yellow' | 'green' | 'all'
+            showHexGrid = false,
+            showRotCenters = false,
+            doubleFrame = true,
+            globalRotateDeg = 30
+        } = {}) {
+            const geom = getExactVideoLizardData(R);
+            const sqrt3 = Math.sqrt(3);
+            const colorKeys = ['red', 'yellow', 'green'];
+            const rotAngles = [0, 240, 120];
+            const clipId = 'tess-clip-' + Math.random().toString(36).substring(2, 9);
+
+            let lizardsMarkup = '';
+            let hexGridMarkup = '';
+            let rotCentersMarkup = '';
+
+            for (let r = -6; r <= 6; r++) {
+                for (let q = -6; q <= 6; q++) {
+                    const cx = width / 2 + R * sqrt3 * (q + r / 2);
+                    const cy = height / 2 + R * 1.5 * r;
+
+                    if (cx < -R * 2.5 || cx > width + R * 2.5 || cy < -R * 2.5 || cy > height + R * 2.5) {
+                        continue;
+                    }
+
+                    const cIdx = ((q - r) % 3 + 3) % 3;
+                    const cKey = colorKeys[cIdx];
+                    const angle = rotAngles[cIdx];
+
+                    let fill = '#ffffff';
+                    let detailOpacity = 0;
+                    let showVec = false;
+
+                    if (mode === 'colored') {
+                        fill = LIZARD_STYLES[cKey].fill;
+                        detailOpacity = 1;
+                    } else if (mode === 'all') {
+                        fill = LIZARD_STYLES[cKey].fill;
+                        detailOpacity = 1;
+                        showVec = true;
+                    } else if (mode === 'red' || mode === 'yellow' || mode === 'green') {
+                        if (cKey === mode) {
+                            fill = LIZARD_STYLES[cKey].fill;
+                            detailOpacity = 1;
+                            showVec = true;
+                        } else {
+                            fill = '#f5f5f4';
+                            detailOpacity = 0.12;
+                        }
+                    }
+
+                    lizardsMarkup += `
+                        <g transform="translate(${cx.toFixed(2)}, ${cy.toFixed(2)}) rotate(${angle})">
+                            <path d="${geom.pathData}" fill="${fill}" stroke="#111111" stroke-width="2.4" stroke-linejoin="round"/>
+                            ${detailOpacity > 0 ? getLizardInternalDetailsSVG(R, cKey, detailOpacity, showVec) : ''}
+                        </g>
+                    `;
+
+                    if (showHexGrid) {
+                        hexGridMarkup += `
+                            <g transform="translate(${cx.toFixed(2)}, ${cy.toFixed(2)})">
+                                <path d="${geom.hexPathData}" fill="none" stroke="#dc2626" stroke-width="2" stroke-dasharray="6,4" opacity="0.88"/>
+                            </g>
+                        `;
+                    }
+
+                    if (showRotCenters) {
+                        const v5 = geom.V[5];
+                        const v1 = geom.V[1];
+                        const v3 = geom.V[3];
+                        [v5, v1, v3].forEach(v => {
+                            rotCentersMarkup += `
+                                <g transform="translate(${(cx + v[0]).toFixed(2)}, ${(cy + v[1]).toFixed(2)})">
+                                    <circle r="7" fill="#f59e0b" opacity="0.45" class="rot-center-glow"/>
+                                    <circle r="3.8" fill="#ffffff" stroke="#dc2626" stroke-width="2.2"/>
+                                </g>
+                            `;
+                        });
+                    }
+                }
+            }
+
+            const frameInset = doubleFrame ? 14 : 0;
+            const frameMarkup = doubleFrame ? `
+                <rect x="4" y="4" width="${width - 8}" height="${height - 8}" fill="none" stroke="#78350f" stroke-width="8" rx="4"/>
+                <rect x="11" y="11" width="${width - 22}" height="${height - 22}" fill="none" stroke="#f59e0b" stroke-width="8"/>
+            ` : '';
+
+            return `
+                <svg viewBox="0 0 ${width} ${height}" class="w-full h-full block select-none">
+                    <defs>
+                        <clipPath id="${clipId}">
+                            <rect x="${frameInset}" y="${frameInset}" width="${width - frameInset * 2}" height="${height - frameInset * 2}"/>
+                        </clipPath>
+                    </defs>
+                    <rect width="${width}" height="${height}" fill="#ffffff"/>
+                    <g clip-path="url(#${clipId})">
+                        <g transform="rotate(${globalRotateDeg}, ${width / 2}, ${height / 2})">
+                            ${lizardsMarkup}
+                            ${hexGridMarkup}
+                            ${rotCentersMarkup}
+                        </g>
+                    </g>
+                    ${frameMarkup}
+                </svg>
+            `;
+        }
+
+        // =====================================================================
+        // PAGE 1 SHOWCASE & CUSTOM IMAGE UPLOAD CONTROLLERS
+        // =====================================================================
+        let page1RotateDeg = 30;
+
+        function renderPage1Showcases() {
+            const outlineSVG = renderTessellationSVG({
+                width: 640,
+                height: 480,
+                R: 68,
+                mode: 'outline',
+                doubleFrame: true,
+                globalRotateDeg: page1RotateDeg
+            });
+            const coloredSVG = renderTessellationSVG({
+                width: 640,
+                height: 480,
+                R: 68,
+                mode: 'colored',
+                doubleFrame: true,
+                globalRotateDeg: page1RotateDeg
+            });
+
+            const outEl = document.getElementById('svg-outline-showcase');
+            const colEl = document.getElementById('svg-colored-showcase');
+            if (outEl) outEl.innerHTML = outlineSVG;
+            if (colEl) colEl.innerHTML = coloredSVG;
+
+            const sliderCol = document.getElementById('slider-colored-layer');
+            const sliderOut = document.getElementById('slider-outline-inner');
+            if (sliderCol) sliderCol.innerHTML = coloredSVG;
+            if (sliderOut) sliderOut.innerHTML = outlineSVG;
+
+            syncSliderInnerSize();
+        }
+
+        function togglePage1Orientation() {
+            page1RotateDeg = page1RotateDeg === 30 ? 0 : 30;
+            renderPage1Showcases();
+        }
+
+        function setDisplayMode(mode) {
+            const sideView = document.getElementById('view-side-by-side');
+            const sliderView = document.getElementById('view-slider-compare');
+            const sideBtn = document.getElementById('mode-side-btn');
+            const sliderBtn = document.getElementById('mode-slider-btn');
+
+            if (mode === 'side') {
+                sideView.classList.remove('hidden');
+                sliderView.classList.add('hidden');
+                sideBtn.className = 'px-3 py-1.5 rounded-md text-xs sm:text-sm font-semibold bg-white text-amber-800 shadow transition';
+                sliderBtn.className = 'px-3 py-1.5 rounded-md text-xs sm:text-sm font-semibold text-stone-700 hover:text-stone-900 transition';
+            } else {
+                sideView.classList.add('hidden');
+                sliderView.classList.remove('hidden');
+                sliderBtn.className = 'px-3 py-1.5 rounded-md text-xs sm:text-sm font-semibold bg-white text-amber-800 shadow transition';
+                sideBtn.className = 'px-3 py-1.5 rounded-md text-xs sm:text-sm font-semibold text-stone-700 hover:text-stone-900 transition';
+                setTimeout(syncSliderInnerSize, 50);
+            }
+        }
+
+        function uploadArtworkFile(event, type) {
+            const file = event.target.files && event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                if (type === 'outline') {
+                    const img = document.getElementById('user-outline-img');
+                    img.src = e.target.result;
+                    showLoadedImg('outline');
+                } else {
+                    const img = document.getElementById('user-colored-img');
+                    img.src = e.target.result;
+                    showLoadedImg('colored');
+                }
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function loadCustomImage(event, imgId, fallbackId) {
+            const file = event.target.files && event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const img = document.getElementById(imgId);
+                const fb = document.getElementById(fallbackId);
+                if (img) {
+                    img.src = e.target.result;
+                    img.classList.remove('hidden');
+                }
+                if (fb) fb.classList.add('hidden');
+            };
+            reader.readAsDataURL(file);
+        }
+
+        // =====================================================================
+        // YOUTUBE VIDEO PLAYBACK & LOCAL MP4 CONTROLLER (FIXES ERROR 153)
+        // =====================================================================
+        function switchVideoPlayMode(mode) {
+            const posterView = document.getElementById('video-poster-view');
+            const embedView = document.getElementById('video-embed-view');
+            const localView = document.getElementById('video-local-view');
+            const posterBtn = document.getElementById('vmode-poster-btn');
+            const embedBtn = document.getElementById('vmode-embed-btn');
+
+            if (localView) {
+                localView.pause();
+                localView.classList.add('hidden');
+            }
+
+            if (mode === 'poster') {
+                posterView.classList.remove('hidden');
+                embedView.classList.add('hidden');
+                embedView.innerHTML = '';
+                posterBtn.className = 'px-3 py-1.5 rounded-lg text-xs font-bold bg-amber-600 text-white shadow transition';
+                embedBtn.className = 'px-3 py-1.5 rounded-lg text-xs font-bold bg-stone-800 hover:bg-stone-700 text-stone-200 border border-stone-600 transition';
+            } else if (mode === 'embed') {
+                posterView.classList.add('hidden');
+                embedView.classList.remove('hidden');
+                posterBtn.className = 'px-3 py-1.5 rounded-lg text-xs font-bold bg-stone-800 hover:bg-stone-700 text-stone-200 border border-stone-600 transition';
+                embedBtn.className = 'px-3 py-1.5 rounded-lg text-xs font-bold bg-amber-600 text-white shadow transition';
+
+                // Construct YouTube embed URL with origin parameter if running on http/https
+                let embedUrl = 'https://www.youtube-nocookie.com/embed/HOoCEwvv7bU?autoplay=1&rel=0&playsinline=1';
+                if (window.location.protocol === 'http:' || window.location.protocol === 'https:') {
+                    embedUrl += '&origin=' + encodeURIComponent(window.location.origin);
+                }
+
+                embedView.innerHTML = `
+                    <iframe class="w-full h-full"
+                            src="${embedUrl}"
+                            title="錯覺藝術大師艾雪的魔幻世界畫展－高雄市立美術館"
+                            frameborder="0"
+                            referrerpolicy="strict-origin-when-cross-origin"
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                            allowfullscreen></iframe>
+                `;
+            }
+        }
+
+        function openYoutubePopupWindow(videoId) {
+            const width = 960;
+            const height = 560;
+            const left = Math.max(0, (window.screen.width - width) / 2);
+            const top = Math.max(0, (window.screen.height - height) / 2);
+            window.open(
+                `https://www.youtube.com/watch?v=${videoId}`,
+                'EscherYoutubePlayer',
+                `width=${width},height=${height},left=${left},top=${top},resizable=yes,scrollbars=no,toolbar=no,menubar=no,location=no,status=no`
+            );
+        }
+
+        function loadLocalVideoFile(event) {
+            const file = event.target.files && event.target.files[0];
+            if (!file) return;
+            const url = URL.createObjectURL(file);
+            const posterView = document.getElementById('video-poster-view');
+            const embedView = document.getElementById('video-embed-view');
+            const localView = document.getElementById('video-local-view');
+
+            posterView.classList.add('hidden');
+            embedView.classList.add('hidden');
+            embedView.innerHTML = '';
+
+            localView.src = url;
+            localView.classList.remove('hidden');
+            localView.play().catch(() => {});
+        }
+
+        // =====================================================================
+        // INTERACTIVE CUTTING BLUEPRINT DIAGRAM & VERTEX FINE-TUNING EDITOR
+        // =====================================================================
+        let activeBlueprintDrag = null;
+
+        function renderCuttingBlueprint() {
+            const svg = document.getElementById('cutting-blueprint-svg');
+            if (!svg) return;
+
+            const showIn = document.getElementById('bp-toggle-in')?.checked ?? true;
+            const showOut = document.getElementById('bp-toggle-out')?.checked ?? true;
+            const showHandles = document.getElementById('bp-toggle-handles')?.checked ?? true;
+
+            const data = getExactVideoLizardData(100);
+
+            // Background grid lines
+            let gridHTML = '';
+            for (let g = -150; g <= 150; g += 25) {
+                gridHTML += `<line x1="${g}" y1="-155" x2="${g}" y2="155" stroke="#e7e5e4" stroke-width="${g === 0 ? 1.2 : 0.6}"/>`;
+                gridHTML += `<line x1="-165" y1="${g}" x2="165" y2="${g}" stroke="#e7e5e4" stroke-width="${g === 0 ? 1.2 : 0.6}"/>`;
+            }
+
+            // Cut regions markup (inPts dashed vs outPts shaded)
+            let cutsHTML = '';
+            data.cuts.forEach(c => {
+                if (showIn) {
+                    cutsHTML += `<path d="${ptsToSvgPath(c.inPts, true)}" fill="${c.color}" fill-opacity="0.10" stroke="${c.color}" stroke-width="1.8" stroke-dasharray="4,3"/>`;
+                }
+                if (showOut) {
+                    cutsHTML += `<path d="${ptsToSvgPath(c.outPts, true)}" fill="${c.color}" fill-opacity="0.28" stroke="${c.color}" stroke-width="2.2"/>`;
+                }
+            });
+
+            // Hexagon vertex labels
+            const vLabels = [
+                { i: 0, text: 'V₀ (0,-100)', dx: 0, dy: -10 },
+                { i: 1, text: 'V₁ (120°中心)', dx: 36, dy: -6 },
+                { i: 2, text: 'V₂', dx: 14, dy: 6 },
+                { i: 3, text: 'V₃ (120°中心)', dx: 0, dy: 16 },
+                { i: 4, text: 'V₄', dx: -16, dy: 8 },
+                { i: 5, text: 'V₅ (120°中心)', dx: -36, dy: -8 }
+            ];
+            const hexVerticesHTML = vLabels.map(vl => {
+                const pt = data.V[vl.i];
+                const isPivot = (vl.i === 1 || vl.i === 3 || vl.i === 5);
+                return `
+                    <g transform="translate(${pt[0].toFixed(1)}, ${pt[1].toFixed(1)})">
+                        <circle r="${isPivot ? 5 : 3.5}" fill="${isPivot ? '#fef08a' : '#fff'}" stroke="#111" stroke-width="2"/>
+                        <text x="${vl.dx}" y="${vl.dy}" font-size="8.5" font-weight="bold" fill="#1c1917" text-anchor="middle">${vl.text}</text>
+                    </g>
+                `;
+            }).join('');
+
+            // Draggable handles for all interior editable points of customLizardMasterPts
+            let handlesHTML = '';
+            if (showHandles) {
+                const groups = [
+                    { key: 'c1_out', color: '#ef4444', prefix: 'C1' },
+                    { key: 'c4_in',  color: '#f97316', prefix: 'C4' },
+                    { key: 'c2_in',  color: '#3b82f6', prefix: 'C2' },
+                    { key: 'c5_out', color: '#a855f7', prefix: 'C5' },
+                    { key: 'c3_in',  color: '#10b981', prefix: 'C3' },
+                    { key: 'c6_out', color: '#14b8a6', prefix: 'C6' }
+                ];
+
+                groups.forEach(g => {
+                    const arr = customLizardMasterPts[g.key];
+                    arr.forEach((pt, idx) => {
+                        // First and last points of each chain are shared boundary/hexagon vertices; keep hexagon corners fixed, allow interior points and split points M_50, M_01, M_23 to be dragged
+                        const isFixedHexVertex = (
+                            (g.key === 'c1_out' && idx === 0) ||
+                            (g.key === 'c4_in'  && idx === arr.length - 1) ||
+                            (g.key === 'c2_in'  && idx === 0) ||
+                            (g.key === 'c5_out' && idx === arr.length - 1) ||
+                            (g.key === 'c3_in'  && idx === 0) ||
+                            (g.key === 'c6_out' && idx === arr.length - 1)
+                        );
+                        if (isFixedHexVertex) return;
+
+                        handlesHTML += `
+                            <g class="cursor-move" onmousedown="startBlueprintDrag(event, '${g.key}', ${idx})" ontouchstart="startBlueprintDrag(event, '${g.key}', ${idx})">
+                                <circle cx="${pt[0].toFixed(1)}" cy="${pt[1].toFixed(1)}" r="5.5" fill="${g.color}" stroke="#ffffff" stroke-width="1.8"/>
+                                <text x="${(pt[0] + 7).toFixed(1)}" y="${(pt[1] - 5).toFixed(1)}" font-size="7.5" font-weight="bold" fill="#111">${g.prefix}_${idx}</text>
+                            </g>
+                        `;
+                    });
+                });
+            }
+
+            svg.innerHTML = `
+                ${gridHTML}
+                <!-- Base Regular Hexagon (Red Dashed) -->
+                <path d="${data.hexPathData}" fill="#fef3c7" fill-opacity="0.25" stroke="#dc2626" stroke-width="2" stroke-dasharray="6,4"/>
+                <!-- Cut & Rotated Polygons -->
+                ${cutsHTML}
+                <!-- Complete Lizard Outline + Internal Details Preview -->
+                <path d="${data.pathData}" fill="none" stroke="#111111" stroke-width="2.5" stroke-linejoin="round"/>
+                ${getLizardInternalDetailsSVG(100, 'red', 0.45, false)}
+                ${hexVerticesHTML}
+                ${handlesHTML}
+            `;
+
+            const textarea = document.getElementById('bp-coords-textarea');
+            if (textarea) {
+                textarea.value = JSON.stringify(customLizardMasterPts, null, 2);
+            }
+        }
+
+        function startBlueprintDrag(e, groupKey, ptIdx) {
+            e.preventDefault();
+            e.stopPropagation();
+            activeBlueprintDrag = { groupKey, ptIdx };
+        }
+
+        function onBlueprintMove(e) {
+            if (!activeBlueprintDrag) return;
+            const svg = document.getElementById('cutting-blueprint-svg');
+            if (!svg) return;
+
+            const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+            const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+            const rect = svg.getBoundingClientRect();
+
+            // Map client coordinates to viewBox (-165, -155, 330, 310)
+            const x = -165 + ((clientX - rect.left) / rect.width) * 330;
+            const y = -155 + ((clientY - rect.top) / rect.height) * 310;
+            const rx = Math.round(x * 2) / 2;
+            const ry = Math.round(y * 2) / 2;
+
+            const { groupKey, ptIdx } = activeBlueprintDrag;
+            customLizardMasterPts[groupKey][ptIdx] = [rx, ry];
+
+            // Keep shared split points M_50, M_01, M_23 synchronized between paired segments
+            if (groupKey === 'c1_out' && ptIdx === customLizardMasterPts.c1_out.length - 1) {
+                customLizardMasterPts.c4_in[0] = [rx, ry];
+            } else if (groupKey === 'c4_in' && ptIdx === 0) {
+                customLizardMasterPts.c1_out[customLizardMasterPts.c1_out.length - 1] = [rx, ry];
+            } else if (groupKey === 'c2_in' && ptIdx === customLizardMasterPts.c2_in.length - 1) {
+                customLizardMasterPts.c5_out[0] = [rx, ry];
+            } else if (groupKey === 'c5_out' && ptIdx === 0) {
+                customLizardMasterPts.c2_in[customLizardMasterPts.c2_in.length - 1] = [rx, ry];
+            } else if (groupKey === 'c3_in' && ptIdx === customLizardMasterPts.c3_in.length - 1) {
+                customLizardMasterPts.c6_out[0] = [rx, ry];
+            } else if (groupKey === 'c6_out' && ptIdx === 0) {
+                customLizardMasterPts.c3_in[customLizardMasterPts.c3_in.length - 1] = [rx, ry];
+            }
+
+            const label = document.getElementById('bp-active-pt-label');
+            if (label) label.textContent = `${groupKey}[${ptIdx}] = (${rx}, ${ry})`;
+
+            renderCuttingBlueprint();
+        }
+
+        function endBlueprintDrag() {
+            if (!activeBlueprintDrag) return;
+            activeBlueprintDrag = null;
+            // Re-render all showcases & interactive labs with the fine-tuned lizard!
+            renderPage1Showcases();
+            renderSixStepCanvas(currentStepVal);
+            updateSkeletonView();
+            renderGameBoard();
+        }
+
+        function resetCustomLizardPts() {
+            customLizardMasterPts = JSON.parse(JSON.stringify(DEFAULT_LIZARD_MASTER_PTS));
+            renderCuttingBlueprint();
+            renderPage1Showcases();
+            renderSixStepCanvas(currentStepVal);
+            updateSkeletonView();
+            renderGameBoard();
+            const label = document.getElementById('bp-active-pt-label');
+            if (label) label.textContent = '已還原預設座標';
+        }
+
+        function copyCustomLizardJSON() {
+            const textarea = document.getElementById('bp-coords-textarea');
+            if (!textarea) return;
+            textarea.select();
+            document.execCommand('copy');
+            const toast = document.getElementById('blueprint-copy-toast');
+            if (toast) {
+                toast.classList.remove('hidden');
+                setTimeout(() => toast.classList.add('hidden'), 2200);
+            }
+        }
+
+        function initComparisonSlider() {
+            const box = document.getElementById('comparison-box');
+            const overlay = document.getElementById('slider-outline-layer');
+            const handle = document.getElementById('slider-handle-bar');
+            if (!box || !overlay || !handle) return;
+            let isDragging = false;
+
+            function moveSlider(clientX) {
+                const rect = box.getBoundingClientRect();
+                let pos = ((clientX - rect.left) / rect.width) * 100;
+                pos = Math.max(2, Math.min(98, pos));
+                overlay.style.width = pos + '%';
+                handle.style.left = pos + '%';
+            }
+
+            box.addEventListener('mousedown', (e) => { isDragging = true; moveSlider(e.clientX); });
+            window.addEventListener('mousemove', (e) => { if (isDragging) moveSlider(e.clientX); });
+            window.addEventListener('mouseup', () => { isDragging = false; });
+
+            box.addEventListener('touchstart', (e) => { isDragging = true; moveSlider(e.touches[0].clientX); }, { passive: true });
+            window.addEventListener('touchmove', (e) => { if (isDragging) moveSlider(e.touches[0].clientX); }, { passive: true });
+            window.addEventListener('touchend', () => { isDragging = false; });
+
+            window.addEventListener('resize', syncSliderInnerSize);
+        }
+
+        function syncSliderInnerSize() {
+            const box = document.getElementById('comparison-box');
+            const inner = document.getElementById('slider-outline-inner');
+            if (box && inner && box.offsetWidth > 0) {
+                inner.style.width = box.offsetWidth + 'px';
+            }
+        }
+
+        // =====================================================================
+        // PAGE 2 MODULE 1: 6-STEP GGB CUT & ROTATE ANIMATION (0 .. 700)
+        // =====================================================================
+        let currentStepVal = 700; // 0 = Hex, 100 = Step 1, ..., 600 = Step 6, 700 = Step 7 (Colored)
+        let morphAnimId = null;
+
+        /**
+         * Renders the exact GeoGebra-style cut-and-rotate animation from the video (00:20 - 01:06)
+         * @param {number} val - Value from 0 to 700:
+         *   0..100:   Step 1 (Head cut rotates +120° around V5)
+         *   100..200: Step 2 (Left Hind Leg cut rotates +120° around V1)
+         *   200..300: Step 3 (Right Hind Leg cut rotates +120° around V3)
+         *   300..400: Step 4 (Left Foreleg cut rotates -120° around V5)
+         *   400..500: Step 5 (Right Forepaw cut rotates -120° around V1)
+         *   500..600: Step 6 (Long Tail cut rotates -120° around V3)
+         *   600..700: Step 7 (Circular clip expands to reveal red lizard with dorsal stripe, spots & eyes, matching video 01:02!)
+         */
+        function renderSixStepCanvas(val) {
+            const R = 105;
+            const data = getExactVideoLizardData(R);
+            const svg = document.getElementById('morph-svg');
+
+            // Calculate progress [0..1] for each of the 6 cut steps
+            const stepProgs = [0, 1, 2, 3, 4, 5].map(idx => {
+                return Math.min(1, Math.max(0, (val - idx * 100) / 100));
+            });
+            // Step 7 coloring progress [0..1]
+            const colorProg = Math.min(1, Math.max(0, (val - 600) / 100));
+
+            // Build the exact intermediate body outline without any overlapping internal lines
+            const intermediateBodyPath = data.buildIntermediateBodyPath(stepProgs);
+            let rotatingPiecesMarkup = '';
+            let activeArcMarkup = '';
+
+            data.cuts.forEach((c, idx) => {
+                const p = stepProgs[idx];
+                // Only draw the separate rotating piece while it is actively rotating (0 < p < 1)
+                if (p > 0.001 && p < 0.999) {
+                    const inPath = ptsToSvgPath(c.inPts, true);
+                    const curAngle = c.angle * p;
+
+                    rotatingPiecesMarkup += `
+                        <g transform="rotate(${curAngle.toFixed(2)}, ${c.pivot[0].toFixed(2)}, ${c.pivot[1].toFixed(2)})">
+                            <path d="${inPath}" fill="#fef08a" stroke="${c.color}" stroke-width="3" stroke-linejoin="round"/>
+                        </g>
+                    `;
+
+                    activeArcMarkup += `
+                        <g transform="translate(${c.pivot[0].toFixed(2)}, ${c.pivot[1].toFixed(2)})">
+                            <circle r="10" fill="${c.color}" opacity="0.35" class="rot-center-glow"/>
+                            <circle r="5" fill="#fff" stroke="${c.color}" stroke-width="3"/>
+                        </g>
+                    `;
+                }
+            });
+
+            // Expanding circle clip-path for Step 7 (matching video 01:02 - 01:06!)
+            const revealRadius = colorProg * R * 1.65;
+
+            svg.innerHTML = `
+                <defs>
+                    <clipPath id="color-reveal-clip">
+                        <circle cx="0" cy="0" r="${revealRadius.toFixed(1)}"/>
+                    </clipPath>
+                </defs>
+
+                ${val < 600 ? `
+                    <!-- Progressive White Polygon Body (Hexagon morphing step-by-step into Lizard) -->
+                    <path d="${intermediateBodyPath}" fill="#ffffff" stroke="#111111" stroke-width="2.6" stroke-linejoin="round"/>
+                    <!-- Currently Rotating Cut Piece -->
+                    ${rotatingPiecesMarkup}
+                ` : `
+                    <!-- Unified Crisp White Lizard Base -->
+                    <path d="${data.pathData}" fill="#ffffff" stroke="#111111" stroke-width="2.8" stroke-linejoin="round"/>
+                    <!-- Expanding Circular Color & Texture Reveal (Video 01:02-01:06) -->
+                    <g clip-path="url(#color-reveal-clip)">
+                        <path d="${data.pathData}" fill="${LIZARD_STYLES.red.fill}" stroke="#111111" stroke-width="2.8" stroke-linejoin="round"/>
+                        ${getLizardInternalDetailsSVG(R, 'red', 1.0, false)}
+                    </g>
+                `}
+
+                <!-- Red Dashed Hexagon Skeleton Overlay (matching video 00:55) -->
+                <path d="${data.hexPathData}" fill="none" stroke="#dc2626" stroke-width="2.2" stroke-dasharray="6,5" opacity="${val >= 580 && val <= 640 ? 0.95 : 0.45}"/>
+
+                <!-- Three 120° Rotation Center Vertices (V5, V1, V3) -->
+                ${[
+                    { pt: data.V[5], label: 'V₅', color: '#ef4444' },
+                    { pt: data.V[1], label: 'V₁', color: '#3b82f6' },
+                    { pt: data.V[3], label: 'V₃', color: '#10b981' }
+                ].map(v => `
+                    <g transform="translate(${v.pt[0].toFixed(1)}, ${v.pt[1].toFixed(1)})">
+                        <circle r="4.5" fill="#fff" stroke="${v.color}" stroke-width="2.5"/>
+                    </g>
+                `).join('')}
+
+                ${activeArcMarkup}
+            `;
+
+            // Update stage badge text
+            const badge = document.getElementById('morph-stage-badge');
+            const label = document.getElementById('morph-percent-label');
+            const stepNum = Math.ceil(val / 100);
+            label.textContent = `Step ${stepNum}/7`;
+
+            const descriptions = [
+                '步驟 0 / 7：原始尖頂正六邊形（對應影片 00:20）',
+                '步驟 1 / 7：左頸凹槽裁切塊繞 V₅ 逆時針轉 120° → 蜥蜴頭部（00:21）',
+                '步驟 2 / 7：右腋下裁切塊繞 V₁ 逆時針轉 120° → 左後腳掌（00:25）',
+                '步驟 3 / 7：大腿內側裁切塊繞 V₃ 逆時針轉 120° → 右後腳掌（00:29）',
+                '步驟 4 / 7：右頸與右臂內側裁切塊繞 V₅ 順時針轉 120° → 左前手掌（00:34）',
+                '步驟 5 / 7：右邊下半三角形繞 V₁ 順時針轉 120° → 高舉的右前手掌（00:41）',
+                '步驟 6 / 7：左腰腹裁切塊繞 V₃ 順時針轉 120° → 彎曲長尾與紅虛線骨架（00:55）',
+                '步驟 7 / 7：完整艾雪蜥蜴著色與立體紋理展開（01:05）'
+            ];
+            badge.textContent = descriptions[stepNum] || descriptions[7];
+        }
+
+        function onMorphSliderChange(val) {
+            stopMorphPlay();
+            currentStepVal = parseFloat(val);
+            renderSixStepCanvas(currentStepVal);
+        }
+
+        function animateToStep(targetVal) {
+            stopMorphPlay();
+            const startVal = currentStepVal;
+            const diff = targetVal - startVal;
+            if (Math.abs(diff) < 1) {
+                currentStepVal = targetVal;
+                document.getElementById('morph-slider').value = targetVal;
+                renderSixStepCanvas(targetVal);
+                return;
+            }
+            const duration = 550;
+            const startTime = performance.now();
+
+            function tick(now) {
+                const t = Math.min(1, (now - startTime) / duration);
+                const ease = t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
+                currentStepVal = startVal + diff * ease;
+                document.getElementById('morph-slider').value = Math.round(currentStepVal);
+                renderSixStepCanvas(currentStepVal);
+                if (t < 1) {
+                    morphAnimId = requestAnimationFrame(tick);
+                } else {
+                    morphAnimId = null;
+                }
+            }
+            morphAnimId = requestAnimationFrame(tick);
+        }
+
+        function toggleMorphPlay() {
+            if (morphAnimId) {
+                stopMorphPlay();
+                return;
+            }
+            if (currentStepVal >= 695) currentStepVal = 0;
+            document.getElementById('morph-play-icon').textContent = '⏸';
+            document.getElementById('morph-play-text').textContent = '暫停動畫';
+
+            function step() {
+                currentStepVal += 2.2;
+                if (currentStepVal >= 700) {
+                    currentStepVal = 700;
+                    document.getElementById('morph-slider').value = 700;
+                    renderSixStepCanvas(700);
+                    stopMorphPlay();
+                    return;
+                }
+                document.getElementById('morph-slider').value = Math.round(currentStepVal);
+                renderSixStepCanvas(currentStepVal);
+                morphAnimId = requestAnimationFrame(step);
+            }
+            morphAnimId = requestAnimationFrame(step);
+        }
+
+        function stopMorphPlay() {
+            if (morphAnimId) {
+                cancelAnimationFrame(morphAnimId);
+                morphAnimId = null;
+            }
+            document.getElementById('morph-play-icon').textContent = '▶';
+            document.getElementById('morph-play-text').textContent = '自動播放完整六步動畫';
+        }
+
+        // =====================================================================
+        // PAGE 2 MODULE 2: GEOMETRIC SKELETON & 120° ROTATION DEMO
+        // =====================================================================
+        let rotClusterAnimId = null;
+
+        function updateSkeletonView() {
+            if (rotClusterAnimId) {
+                cancelAnimationFrame(rotClusterAnimId);
+                rotClusterAnimId = null;
+            }
+            const showHex = document.getElementById('toggle-hex-grid').checked;
+            const showCenters = document.getElementById('toggle-rot-centers').checked;
+            const showColor = document.getElementById('toggle-skeleton-color').checked;
+
+            const svgContent = renderTessellationSVG({
+                width: 640,
+                height: 480,
+                R: 66,
+                mode: showColor ? 'colored' : 'outline',
+                showHexGrid: showHex,
+                showRotCenters: showCenters,
+                doubleFrame: false,
+                globalRotateDeg: 0
+            });
+
+            const wrapper = document.createElement('div');
+            wrapper.innerHTML = svgContent;
+            document.getElementById('skeleton-svg').innerHTML = wrapper.querySelector('svg').innerHTML;
+            document.getElementById('rotation-toast').textContent = '紅色虛線為正六邊形骨架 • 發光圓點為 120° 三方交會旋轉中心';
+        }
+
+        function playRotationClusterDemo() {
+            if (rotClusterAnimId) cancelAnimationFrame(rotClusterAnimId);
+
+            const svg = document.getElementById('skeleton-svg');
+            const R = 74;
+            const geom = getExactVideoLizardData(R);
+
+            // Pivot around V5 (-86.6025*s, -50*s) placed at canvas center (320, 250)
+            const v5 = geom.V[5];
+            const pivotX = 320;
+            const pivotY = 250;
+
+            let progress = 0;
+            const toast = document.getElementById('rotation-toast');
+
+            function animateCluster() {
+                progress += 0.85;
+                if (progress > 100) progress = 100;
+
+                // Matching video 01:07 - 01:15:
+                // 1. Red lizard at 0°
+                // 2. Yellow lizard rotates -120° CCW around V5
+                // 3. Green lizard rotates -240° CCW (+120°) around V5
+                const p1 = Math.min(1, progress / 48);
+                const p2 = Math.min(1, Math.max(0, (progress - 48) / 48));
+
+                const angleYellow = -120 * p1;
+                const angleGreen = -240 * p2;
+
+                svg.innerHTML = `
+                    <rect width="640" height="480" fill="#1c1917"/>
+                    <g transform="translate(${pivotX}, ${pivotY})">
+                        <circle r="${R * 1.45}" fill="none" stroke="#44403c" stroke-width="1.5" stroke-dasharray="4,4"/>
+
+                        <!-- 1. Base Red Lizard (0°) -->
+                        <g transform="rotate(0) translate(${-v5[0]}, ${-v5[1]})">
+                            <path d="${geom.hexPathData}" fill="none" stroke="#ef4444" stroke-width="1.8" stroke-dasharray="5,4" opacity="0.65"/>
+                            <path d="${geom.pathData}" fill="${LIZARD_STYLES.red.fill}" stroke="#111" stroke-width="2.5" stroke-linejoin="round"/>
+                            ${getLizardInternalDetailsSVG(R, 'red', 1, false)}
+                        </g>
+
+                        <!-- 2. Rotating Yellow Lizard (0° -> -120° CCW) -->
+                        <g transform="rotate(${angleYellow.toFixed(1)}) translate(${-v5[0]}, ${-v5[1]})" opacity="${p1 > 0 ? 0.96 : 0}">
+                            <path d="${geom.hexPathData}" fill="none" stroke="#facc15" stroke-width="1.8" stroke-dasharray="5,4" opacity="0.65"/>
+                            <path d="${geom.pathData}" fill="${LIZARD_STYLES.yellow.fill}" stroke="#111" stroke-width="2.5" stroke-linejoin="round"/>
+                            ${getLizardInternalDetailsSVG(R, 'yellow', 1, false)}
+                        </g>
+
+                        <!-- 3. Rotating Green Lizard (0° -> -240° CCW) -->
+                        <g transform="rotate(${angleGreen.toFixed(1)}) translate(${-v5[0]}, ${-v5[1]})" opacity="${p2 > 0 ? 0.96 : 0}">
+                            <path d="${geom.hexPathData}" fill="none" stroke="#4ade80" stroke-width="1.8" stroke-dasharray="5,4" opacity="0.65"/>
+                            <path d="${geom.pathData}" fill="${LIZARD_STYLES.green.fill}" stroke="#111" stroke-width="2.5" stroke-linejoin="round"/>
+                            ${getLizardInternalDetailsSVG(R, 'green', 1, false)}
+                        </g>
+
+                        <!-- Center of 120° Rotation Marker -->
+                        <circle r="11" fill="#f59e0b" opacity="0.4" class="rot-center-glow"/>
+                        <circle r="5.5" fill="#ffffff" stroke="#dc2626" stroke-width="3"/>
+                        <text x="14" y="-12" fill="#fde68a" font-size="13" font-weight="bold">V₅ (120° 旋轉中心)</text>
+                    </g>
+                `;
+
+                if (progress < 48) {
+                    toast.textContent = `正在繞頂點 V₅ 逆時針旋轉複製黃色蜥蜴：${Math.round(Math.abs(angleYellow))}° / 120°`;
+                } else if (progress < 98) {
+                    toast.textContent = `正在繞頂點 V₅ 逆時針旋轉複製綠色蜥蜴：${Math.round(Math.abs(angleGreen))}° / 240°`;
+                } else {
+                    toast.textContent = `✨ 完成！紅(0°)、黃(-120°)、綠(-240°) 三隻蜥蜴在頂點處 360° 無縫密合！`;
+                }
+
+                if (progress < 100) {
+                    rotClusterAnimId = requestAnimationFrame(animateCluster);
+                }
+            }
+
+            rotClusterAnimId = requestAnimationFrame(animateCluster);
+        }
+
+        // =====================================================================
+        // PAGE 2 MODULE 3: 3-COLORING & DIRECTIONAL RHYTHM
+        // =====================================================================
+        function setColoringMode(mode) {
+            const svgContent = renderTessellationSVG({
+                width: 640,
+                height: 480,
+                R: 64,
+                mode: mode,
+                showHexGrid: false,
+                showRotCenters: false,
+                doubleFrame: false,
+                globalRotateDeg: 30
+            });
+
+            const wrapper = document.createElement('div');
+            wrapper.innerHTML = svgContent;
+            document.getElementById('coloring-svg').innerHTML = wrapper.querySelector('svg').innerHTML;
+
+            const modes = ['outline', 'red', 'yellow', 'green', 'all'];
+            modes.forEach(m => {
+                const btn = document.getElementById('cbtn-' + m);
+                if (m === mode) {
+                    btn.classList.add('ring-2', 'ring-amber-500', 'scale-[1.02]');
+                } else {
+                    btn.classList.remove('ring-2', 'ring-amber-500', 'scale-[1.02]');
+                }
+            });
+        }
+
+        // =====================================================================
+        // PAGE 3: INTERACTIVE LIZARD COLORING GAME, ZOOM/PAN & FIREWORKS
+        // =====================================================================
+        const GAME_RANGE_CONFIG = {
+            small:  { R: 96,  label: '小範圍（入門）', margin: 90 },
+            medium: { R: 68,  label: '中範圍（預設）', margin: 72 },
+            large:  { R: 48,  label: '大範圍（挑戰）', margin: 58 }
+        };
+
+        let gameRange = 'medium';       // Default is 'medium' per user instruction
+        let gameBrush = 'cycle';        // 'cycle' | 'red' | 'yellow' | 'green' | 'erase'
+        let gameLizardNodes = [];       // Array of lizard cells in the grid
+        let gameNodeMap = new Map();    // Key "q,r" -> node object
+        let gameSolved = false;
+
+        // Zoom & Pan State
+        let gameZoom = 1.0;
+        let gamePanX = 0;
+        let gamePanY = 0;
+        let isPanningGame = false;
+        let panStartX = 0;
+        let panStartY = 0;
+        let panMovedDistance = 0;
+
+        function initGameGrid(rangeKey = 'medium') {
+            gameRange = rangeKey;
+            gameSolved = false;
+            stopFireworksCelebration();
+            document.getElementById('victory-banner').classList.add('hidden');
+
+            // Update range buttons UI
+            ['small', 'medium', 'large'].forEach(k => {
+                const btn = document.getElementById('range-btn-' + k);
+                if (!btn) return;
+                if (k === rangeKey) {
+                    btn.className = 'px-3 py-1.5 rounded-lg text-xs sm:text-sm font-bold transition bg-amber-600 text-white shadow';
+                } else {
+                    btn.className = 'px-3 py-1.5 rounded-lg text-xs sm:text-sm font-bold transition text-stone-300 hover:text-white';
+                }
+            });
+
+            const cfg = GAME_RANGE_CONFIG[rangeKey] || GAME_RANGE_CONFIG.medium;
+            const R = cfg.R;
+            const width = 800;
+            const height = 600;
+            const sqrt3 = Math.sqrt(3);
+            const globalRotRad = degToRad(30);
+            const cos30 = Math.cos(globalRotRad);
+            const sin30 = Math.sin(globalRotRad);
+
+            gameLizardNodes = [];
+            gameNodeMap.clear();
+
+            for (let r = -7; r <= 7; r++) {
+                for (let q = -7; q <= 7; q++) {
+                    // Unrotated coordinates relative to center (width/2, height/2)
+                    const ux = R * sqrt3 * (q + r / 2);
+                    const uy = R * 1.5 * r;
+
+                    // Coordinates after 30° rotation around canvas center
+                    const rx = width / 2 + (ux * cos30 - uy * sin30);
+                    const ry = height / 2 + (ux * sin30 + uy * cos30);
+
+                    // Skip lizards completely outside the viewport
+                    if (rx < -R * 1.6 || rx > width + R * 1.6 || ry < -R * 1.6 || ry > height + R * 1.6) {
+                        continue;
+                    }
+
+                    // Playable lizards are those whose centers fall comfortably inside the orange frame
+                    const isPlayable = (
+                        rx >= cfg.margin &&
+                        rx <= width - cfg.margin &&
+                        ry >= cfg.margin &&
+                        ry <= height - cfg.margin
+                    );
+
+                    const cIdx = ((q - r) % 3 + 3) % 3;
+                    const rotAngles = [0, 240, 120];
+                    const angle = rotAngles[cIdx];
+
+                    const node = {
+                        key: `${q},${r}`,
+                        q,
+                        r,
+                        cx: width / 2 + ux,
+                        cy: height / 2 + uy,
+                        rx,
+                        ry,
+                        cIdx,
+                        angle,
+                        isPlayable,
+                        color: null,     // null | 'red' | 'yellow' | 'green'
+                        hasConflict: false,
+                        isHinted: false
+                    };
+
+                    gameLizardNodes.push(node);
+                    gameNodeMap.set(node.key, node);
+                }
+            }
+
+            renderGameBoard();
+        }
+
+        function setGameRange(rangeKey) {
+            resetGameZoomPan();
+            initGameGrid(rangeKey);
+        }
+
+        function setGameBrush(brushKey) {
+            gameBrush = brushKey;
+            const brushes = [
+                { id: 'cycle', activeClass: 'bg-amber-600 text-white shadow', idleClass: 'bg-stone-800 text-stone-300 hover:bg-stone-700' },
+                { id: 'red',   activeClass: 'bg-red-600 text-white ring-2 ring-red-300 shadow', idleClass: 'bg-stone-800 text-red-300 hover:bg-red-950 border border-red-500/40' },
+                { id: 'yellow',activeClass: 'bg-yellow-500 text-stone-950 ring-2 ring-yellow-200 shadow', idleClass: 'bg-stone-800 text-yellow-200 hover:bg-yellow-950 border border-yellow-400/40' },
+                { id: 'green', activeClass: 'bg-emerald-600 text-white ring-2 ring-emerald-300 shadow', idleClass: 'bg-stone-800 text-emerald-300 hover:bg-emerald-950 border border-emerald-400/40' },
+                { id: 'erase', activeClass: 'bg-stone-500 text-white shadow', idleClass: 'bg-stone-800 text-stone-300 hover:bg-stone-700 border border-stone-600' }
+            ];
+
+            brushes.forEach(b => {
+                const btn = document.getElementById('brush-btn-' + b.id);
+                if (!btn) return;
+                btn.className = `px-2.5 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 ${b.id === brushKey ? b.activeClass : b.idleClass}`;
+            });
+        }
+
+        function evaluateGameAdjacency() {
+            const neighborOffsets = [
+                [1, 0], [-1, 0], [0, 1], [0, -1], [1, -1], [-1, 1]
+            ];
+
+            gameLizardNodes.forEach(n => { n.hasConflict = false; });
+
+            let conflictPairs = 0;
+            const playableNodes = gameLizardNodes.filter(n => n.isPlayable);
+
+            for (let i = 0; i < playableNodes.length; i++) {
+                const node = playableNodes[i];
+                if (!node.color) continue;
+
+                neighborOffsets.forEach(([dq, dr]) => {
+                    const nb = gameNodeMap.get(`${node.q + dq},${node.r + dr}`);
+                    if (nb && nb.isPlayable && nb.color && nb.color === node.color) {
+                        node.hasConflict = true;
+                        nb.hasConflict = true;
+                        if (node.key < nb.key) conflictPairs++;
+                    }
+                });
+            }
+
+            const coloredCount = playableNodes.filter(n => n.color !== null).length;
+            const totalPlayable = playableNodes.length;
+
+            // Update score counters
+            document.getElementById('game-progress-text').textContent = `${coloredCount} / ${totalPlayable}`;
+            const conflictText = document.getElementById('game-conflict-text');
+            const conflictCard = document.getElementById('game-conflict-card');
+            const statusBar = document.getElementById('game-status-bar');
+            const statusText = document.getElementById('game-status-text');
+
+            conflictText.textContent = `${conflictPairs} 處`;
+
+            if (conflictPairs > 0) {
+                conflictText.className = 'text-xl font-black text-red-600 font-mono';
+                conflictCard.className = 'bg-red-50 border border-red-400 rounded-xl px-4 py-2.5 shadow-sm text-center min-w-[120px] transition';
+                statusText.innerHTML = `⚠️ 發現 <span class="text-red-400 font-bold">${conflictPairs}</span> 處相鄰蜥蜴同色（紅框閃爍處），請點選該蜥蜴更換顏色！`;
+                if (statusBar) statusBar.classList.add('bg-red-950/60');
+            } else {
+                conflictText.className = 'text-xl font-black text-emerald-600 font-mono';
+                conflictCard.className = 'bg-white border border-stone-200 rounded-xl px-4 py-2.5 shadow-sm text-center min-w-[120px] transition';
+                if (statusBar) statusBar.classList.remove('bg-red-950/60');
+                
+                if (coloredCount === 0) {
+                    statusText.textContent = `💡 點選任意白色蜥蜴即可塗色；按住 Shift 或於放大時右鍵／雙指拖曳可平移畫布，滾輪可縮放。`;
+                } else if (coloredCount < totalPlayable) {
+                    statusText.textContent = `✨ 目前無任何同色相鄰衝突！還差 ${totalPlayable - coloredCount} 隻蜥蜴即可過關。`;
+                }
+            }
+
+            // Check win condition: all playable lizards colored & 0 conflicts
+            if (coloredCount === totalPlayable && totalPlayable > 0 && conflictPairs === 0) {
+                if (!gameSolved) {
+                    gameSolved = true;
+                    // Automatically fill outer border lizards with the matching valid 3-coloring so the whole frame looks like a finished masterpiece!
+                    autoColorBorderLizards(playableNodes);
+                    statusText.textContent = `🎆 恭喜完成所有蜥蜴著色且同色不相鄰！正在播放慶祝煙火！`;
+                    document.getElementById('victory-banner').classList.remove('hidden');
+                    startFireworksCelebration();
+                }
+            } else {
+                gameSolved = false;
+            }
+        }
+
+        function autoColorBorderLizards(playableNodes) {
+            // Determine which color the user assigned to each cIdx (0, 1, 2)
+            const cIdxToColor = {};
+            playableNodes.forEach(n => {
+                if (n.color) cIdxToColor[n.cIdx] = n.color;
+            });
+            gameLizardNodes.forEach(n => {
+                if (!n.isPlayable && cIdxToColor[n.cIdx]) {
+                    n.color = cIdxToColor[n.cIdx];
+                }
+            });
+        }
+
+        function onLizardClick(key) {
+            if (panMovedDistance > 6) return; // Ignore click if user was dragging to pan
+            const node = gameNodeMap.get(key);
+            if (!node) return;
+
+            // If user clicks an outer border lizard, still let them color it or map it
+            const cycleOrder = [null, 'red', 'yellow', 'green'];
+            if (gameBrush === 'cycle') {
+                const idx = cycleOrder.indexOf(node.color);
+                node.color = cycleOrder[(idx + 1) % cycleOrder.length];
+            } else if (gameBrush === 'erase') {
+                node.color = null;
+            } else {
+                // If already painted with selected brush color, cycle to next color so repeated clicks on the same lizard also work smoothly!
+                if (node.color === gameBrush) {
+                    const order = ['red', 'yellow', 'green', null];
+                    node.color = order[(order.indexOf(node.color) + 1) % order.length];
+                } else {
+                    node.color = gameBrush;
+                }
+            }
+
+            node.isHinted = false;
+            playClickPopSound(node.color);
+            evaluateGameAdjacency();
+            renderGameBoard();
+        }
+
+        function renderGameBoard() {
+            const cfg = GAME_RANGE_CONFIG[gameRange] || GAME_RANGE_CONFIG.medium;
+            const R = cfg.R;
+            const width = 800;
+            const height = 600;
+            const geom = getExactVideoLizardData(R);
+            const showDetails = document.getElementById('toggle-game-details')?.checked ?? true;
+
+            let lizardsHTML = '';
+
+            // Draw non-playable border lizards first, then playable lizards on top so playable outlines are crisp
+            const sortedNodes = [...gameLizardNodes].sort((a, b) => (a.isPlayable === b.isPlayable ? 0 : a.isPlayable ? 1 : -1));
+
+            sortedNodes.forEach(node => {
+                let fill = '#ffffff';
+                let detailAlpha = 0;
+
+                if (node.color && LIZARD_STYLES[node.color]) {
+                    fill = LIZARD_STYLES[node.color].fill;
+                    detailAlpha = showDetails ? 1 : 0;
+                } else if (!node.isPlayable) {
+                    fill = '#f5f2eb';
+                }
+
+                const conflictClass = node.hasConflict ? 'lizard-conflict' : '';
+                const hintClass = node.isHinted ? 'lizard-hint' : '';
+                const playableClass = node.isPlayable ? 'playable-lizard' : 'opacity-65 cursor-pointer';
+                const strokeColor = node.isPlayable ? '#111111' : '#78716c';
+                const strokeWidth = node.isPlayable ? 2.8 : 1.8;
+                const dashAttr = (!node.isPlayable && !gameSolved) ? 'stroke-dasharray="5,4"' : '';
+
+                lizardsHTML += `
+                    <g class="${playableClass} ${conflictClass} ${hintClass}"
+                       transform="translate(${node.cx.toFixed(2)}, ${node.cy.toFixed(2)}) rotate(${node.angle})"
+                       onclick="onLizardClick('${node.key}')">
+                        <path class="lizard-main-outline" d="${geom.pathData}" 
+                              fill="${fill}" stroke="${strokeColor}" stroke-width="${strokeWidth}" ${dashAttr} stroke-linejoin="round"/>
+                        ${node.color ? getLizardInternalDetailsSVG(R, node.color, detailAlpha, false) : ''}
+                        ${node.isPlayable && !node.color ? `
+                            <circle cx="0" cy="0" r="${(R * 0.08).toFixed(1)}" fill="#d6d3d1" opacity="0.7"/>
+                        ` : ''}
+                    </g>
+                `;
+            });
+
+            const svg = document.getElementById('game-board-svg');
+            svg.innerHTML = `
+                <defs>
+                    <clipPath id="game-frame-clip">
+                        <rect x="16" y="16" width="${width - 32}" height="${height - 32}" rx="4"/>
+                    </clipPath>
+                </defs>
+                <rect width="${width}" height="${height}" fill="#ffffff"/>
+                <g clip-path="url(#game-frame-clip)">
+                    <g transform="rotate(30, ${width / 2}, ${height / 2})">
+                        ${lizardsHTML}
+                    </g>
+                </g>
+                <!-- Classic Double Orange/Brown Frame matching image_86bbe3.jpg -->
+                <rect x="4" y="4" width="${width - 8}" height="${height - 8}" fill="none" stroke="#78350f" stroke-width="8" rx="6" pointer-events="none"/>
+                <rect x="12" y="12" width="${width - 24}" height="${height - 24}" fill="none" stroke="#f59e0b" stroke-width="9" pointer-events="none"/>
+            `;
+        }
+
+        function highlightGameHint() {
+            const playableNodes = gameLizardNodes.filter(n => n.isPlayable);
+            const targets = playableNodes.filter(n => n.hasConflict || !n.color);
+            if (targets.length === 0) return;
+
+            targets.forEach(n => { n.isHinted = true; });
+            renderGameBoard();
+            setTimeout(() => {
+                targets.forEach(n => { n.isHinted = false; });
+                renderGameBoard();
+            }, 2400);
+        }
+
+        function resetGameBoard() {
+            gameSolved = false;
+            stopFireworksCelebration();
+            document.getElementById('victory-banner').classList.add('hidden');
+            gameLizardNodes.forEach(n => {
+                n.color = null;
+                n.hasConflict = false;
+                n.isHinted = false;
+            });
+            evaluateGameAdjacency();
+            renderGameBoard();
+        }
+
+        function closeVictoryBanner() {
+            document.getElementById('victory-banner').classList.add('hidden');
+            stopFireworksCelebration();
+        }
+
+        // =====================================================================
+        // ZOOM, PAN & FULLSCREEN CONTROLLERS
+        // =====================================================================
+        function updateGameTransform() {
+            const layer = document.getElementById('game-transform-layer');
+            if (!layer) return;
+            layer.style.transform = `translate(${gamePanX.toFixed(1)}px, ${gamePanY.toFixed(1)}px) scale(${gameZoom.toFixed(2)})`;
+            document.getElementById('game-zoom-slider').value = Math.round(gameZoom * 100);
+            document.getElementById('game-zoom-label').textContent = `${Math.round(gameZoom * 100)}%`;
+        }
+
+        function setGameZoom(newZoom) {
+            gameZoom = Math.max(0.5, Math.min(2.5, newZoom));
+            if (gameZoom <= 1.0) {
+                gamePanX = 0;
+                gamePanY = 0;
+            }
+            updateGameTransform();
+        }
+
+        function adjustGameZoom(delta) {
+            setGameZoom(gameZoom + delta);
+        }
+
+        function resetGameZoomPan() {
+            gameZoom = 1.0;
+            gamePanX = 0;
+            gamePanY = 0;
+            updateGameTransform();
+        }
+
+        function initGameViewportInteractions() {
+            const viewport = document.getElementById('game-viewport');
+            if (!viewport) return;
+
+            // Mouse wheel zoom (only when holding Ctrl/Alt/Meta or when already zoomed in, so normal page scrolling never gets blocked!)
+            viewport.addEventListener('wheel', (e) => {
+                if (e.ctrlKey || e.metaKey || e.altKey || gameZoom > 1.01) {
+                    e.preventDefault();
+                    const delta = e.deltaY < 0 ? 0.12 : -0.12;
+                    setGameZoom(gameZoom + delta);
+                }
+            }, { passive: false });
+
+            // Drag to pan (when zoomed in or dragging)
+            viewport.addEventListener('mousedown', (e) => {
+                isPanningGame = true;
+                panMovedDistance = 0;
+                panStartX = e.clientX - gamePanX;
+                panStartY = e.clientY - gamePanY;
+            });
+
+            window.addEventListener('mousemove', (e) => {
+                if (!isPanningGame) return;
+                const nx = e.clientX - panStartX;
+                const ny = e.clientY - panStartY;
+                panMovedDistance += Math.hypot(nx - gamePanX, ny - gamePanY);
+                if (gameZoom > 1.0 || e.shiftKey || e.buttons === 2) {
+                    gamePanX = nx;
+                    gamePanY = ny;
+                    updateGameTransform();
+                }
+            });
+
+            window.addEventListener('mouseup', () => {
+                isPanningGame = false;
+            });
+        }
+
+        function toggleStageFullscreen() {
+            toggleAppFullscreen('coloring-stage-wrapper');
+        }
+
+        function toggleAppFullscreen(targetId) {
+            const el = document.getElementById(targetId) || document.documentElement;
+            const isPseudo = el.classList.contains('pseudo-fullscreen');
+
+            if (document.fullscreenElement) {
+                document.exitFullscreen().catch(() => {});
+                return;
+            }
+            if (isPseudo) {
+                el.classList.remove('pseudo-fullscreen');
+                document.body.style.overflow = '';
+                updateFullscreenLabels(false);
+                return;
+            }
+
+            if (el.requestFullscreen) {
+                el.requestFullscreen().then(() => {
+                    updateFullscreenLabels(true);
+                }).catch(() => {
+                    // Fallback if iframe permissions block native Fullscreen API
+                    el.classList.add('pseudo-fullscreen');
+                    updateFullscreenLabels(true);
+                });
+            } else {
+                el.classList.add('pseudo-fullscreen');
+                updateFullscreenLabels(true);
+            }
+        }
+
+        function updateFullscreenLabels(isFs) {
+            const stageText = document.getElementById('stage-fs-text');
+            const globalText = document.getElementById('global-fs-text');
+            if (stageText) stageText.textContent = isFs ? '退出全螢幕' : '全螢幕';
+            if (globalText) globalText.textContent = isFs ? '退出全螢幕' : '全螢幕瀏覽網頁';
+        }
+
+        document.addEventListener('fullscreenchange', () => {
+            updateFullscreenLabels(!!document.fullscreenElement);
+        });
+
+        // =====================================================================
+        // FIREWORKS ANIMATION & AUDIO EFFECTS ON VICTORY
+        // =====================================================================
+        let fwAnimId = null;
+        let fwParticles = [];
+        let fwRockets = [];
+        let audioCtx = null;
+
+        function getAudioContext() {
+            if (!audioCtx && (window.AudioContext || window.webkitAudioContext)) {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            }
+            return audioCtx;
+        }
+
+        function playClickPopSound(colorKey) {
+            try {
+                const ctx = getAudioContext();
+                if (!ctx) return;
+                const osc = ctx.createOscillator();
+                const gain = ctx.createGain();
+                const freqs = { red: 440, yellow: 554.37, green: 659.25 };
+                osc.frequency.value = freqs[colorKey] || 330;
+                osc.type = 'sine';
+                gain.gain.setValueAtTime(0.08, ctx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.12);
+                osc.connect(gain);
+                gain.connect(ctx.destination);
+                osc.start();
+                osc.stop(ctx.currentTime + 0.12);
+            } catch (e) {}
+        }
+
+        function playVictoryFanfare() {
+            try {
+                const ctx = getAudioContext();
+                if (!ctx) return;
+                const notes = [523.25, 659.25, 783.99, 1046.50];
+                notes.forEach((freq, idx) => {
+                    const osc = ctx.createOscillator();
+                    const gain = ctx.createGain();
+                    const start = ctx.currentTime + idx * 0.11;
+                    osc.frequency.setValueAtTime(freq, start);
+                    osc.type = 'triangle';
+                    gain.gain.setValueAtTime(0.12, start);
+                    gain.gain.exponentialRampToValueAtTime(0.001, start + 0.45);
+                    osc.connect(gain);
+                    gain.connect(ctx.destination);
+                    osc.start(start);
+                    osc.stop(start + 0.45);
+                });
+            } catch (e) {}
+        }
+
+        function startFireworksCelebration() {
+            stopFireworksCelebration();
+            playVictoryFanfare();
+
+            const canvas = document.getElementById('fireworks-canvas');
+            if (!canvas) return;
+            canvas.classList.remove('hidden');
+            const rect = canvas.parentElement.getBoundingClientRect();
+            canvas.width = rect.width || 800;
+            canvas.height = rect.height || 600;
+            const ctx = canvas.getContext('2d');
+
+            fwParticles = [];
+            fwRockets = [];
+            let frameCount = 0;
+
+            function spawnBurst(x, y) {
+                const palette = ['#ff2a14', '#facc15', '#4ade80', '#38bdf8', '#f472b6', '#ffffff', '#fb923c'];
+                const count = 65;
+                for (let i = 0; i < count; i++) {
+                    const angle = (Math.PI * 2 * i) / count + (Math.random() - 0.5) * 0.2;
+                    const speed = 2.2 + Math.random() * 5.8;
+                    fwParticles.push({
+                        x,
+                        y,
+                        vx: Math.cos(angle) * speed,
+                        vy: Math.sin(angle) * speed,
+                        alpha: 1,
+                        decay: 0.012 + Math.random() * 0.012,
+                        color: palette[Math.floor(Math.random() * palette.length)],
+                        size: 2.5 + Math.random() * 2.5
+                    });
+                }
+            }
+
+            // Initial immediate bursts
+            spawnBurst(canvas.width * 0.25, canvas.height * 0.35);
+            spawnBurst(canvas.width * 0.75, canvas.height * 0.32);
+            spawnBurst(canvas.width * 0.50, canvas.height * 0.25);
+
+            function loop() {
+                frameCount++;
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+                if (frameCount % 22 === 0 && frameCount < 320) {
+                    const bx = canvas.width * (0.15 + Math.random() * 0.7);
+                    const by = canvas.height * (0.18 + Math.random() * 0.45);
+                    spawnBurst(bx, by);
+                }
+
+                for (let i = fwParticles.length - 1; i >= 0; i--) {
+                    const p = fwParticles[i];
+                    p.x += p.vx;
+                    p.y += p.vy;
+                    p.vy += 0.08; // gravity
+                    p.vx *= 0.985;
+                    p.alpha -= p.decay;
+
+                    if (p.alpha <= 0) {
+                        fwParticles.splice(i, 1);
+                        continue;
+                    }
+
+                    ctx.save();
+                    ctx.globalAlpha = Math.max(0, p.alpha);
+                    ctx.fillStyle = p.color;
+                    ctx.shadowColor = p.color;
+                    ctx.shadowBlur = 8;
+                    ctx.beginPath();
+                    ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.restore();
+                }
+
+                if (frameCount < 360 || fwParticles.length > 0) {
+                    fwAnimId = requestAnimationFrame(loop);
+                } else {
+                    canvas.classList.add('hidden');
+                    fwAnimId = null;
+                }
+            }
+
+            fwAnimId = requestAnimationFrame(loop);
+        }
+
+        function stopFireworksCelebration() {
+            if (fwAnimId) {
+                cancelAnimationFrame(fwAnimId);
+                fwAnimId = null;
+            }
+            const canvas = document.getElementById('fireworks-canvas');
+            if (canvas) canvas.classList.add('hidden');
+        }
+
+        // =====================================================================
+        // TAB NAVIGATION & INITIAL RENDER ON LOAD
+        // =====================================================================
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+            document.getElementById(tabId).classList.add('active');
+
+            const tabs = [
+                { id: 'page1', btnId: 'tab-btn-1', border: '' },
+                { id: 'page2', btnId: 'tab-btn-2', border: 'border-t sm:border-t-0 sm:border-l border-amber-800/50' },
+                { id: 'page3', btnId: 'tab-btn-3', border: 'border-t sm:border-t-0 sm:border-l border-amber-800/50' }
+            ];
+
+            tabs.forEach(t => {
+                const btn = document.getElementById(t.btnId);
+                if (!btn) return;
+                if (t.id === tabId) {
+                    btn.className = `py-4 px-3 text-center font-bold text-sm sm:text-base lg:text-lg transition-all duration-200 bg-amber-600 text-white shadow-inner flex items-center justify-center gap-2 ${t.border}`;
+                } else {
+                    btn.className = `py-4 px-3 text-center font-bold text-sm sm:text-base lg:text-lg transition-all duration-200 text-amber-200/80 hover:bg-white/10 hover:text-white flex items-center justify-center gap-2 ${t.border}`;
+                }
+            });
+
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            document.body.firstElementChild.id = 'app-main-card';
+
+            // Render Page 1 Showcases & Cutting Blueprint
+            renderPage1Showcases();
+            initComparisonSlider();
+            renderCuttingBlueprint();
+
+            window.addEventListener('mousemove', onBlueprintMove);
+            window.addEventListener('mouseup', endBlueprintDrag);
+            window.addEventListener('touchmove', onBlueprintMove, { passive: false });
+            window.addEventListener('touchend', endBlueprintDrag);
+
+            // Render subtle header pattern
+            document.getElementById('header-bg-pattern').innerHTML = renderTessellationSVG({
+                width: 900,
+                height: 220,
+                R: 48,
+                mode: 'outline',
+                doubleFrame: false,
+                globalRotateDeg: 30
+            });
+
+            // Initialize Page 2 Interactive Modules
+            renderSixStepCanvas(700);
+            updateSkeletonView();
+            setColoringMode('all');
+
+            // Initialize Page 3 Interactive Coloring Challenge (Default range: Medium)
+            initGameGrid('medium');
+            initGameViewportInteractions();
+        });
+    </script>
+</body>
+</html>
