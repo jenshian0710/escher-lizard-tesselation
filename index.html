@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="referrer" content="strict-origin-when-cross-origin">
-    <title>艾雪（M. C. Escher）『蜥蜴』平面鑲嵌之幾何與藝術</title>
+    <title>艾雪（M. C. Escher）『蜥蜴』平面鑲嵌之幾何與藝術（1117發佈版）</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700&family=Noto+Serif+TC:wght@500;600;700;900&display=swap" rel="stylesheet">
     <style>
@@ -198,6 +198,8 @@
                     <span>數學與視覺藝術跨領域互動展</span>
                     <span>•</span>
                     <span>Regular Division of the Plane No. 25</span>
+                    <span>•</span>
+                    <span class="bg-amber-400 text-stone-950 font-bold px-2 py-0.5 rounded-full text-xs">1117發佈版</span>
                 </div>
                 <h1 class="text-2xl sm:text-4xl md:text-5xl font-bold tracking-wide mb-3 text-amber-50 drop-shadow">
                     艾雪（M. C. Escher）『蜥蜴』平面鑲嵌藝術
@@ -269,14 +271,6 @@
                                         <path d="M108,172 C112,198 135,198 138,172 Z" fill="#f5f5f4"/>
                                     </svg>
                                     <span class="text-xs text-stone-400">M. C. Escher (1898–1972) 藝術肖像</span>
-                                </div>
-
-                                <div class="absolute bottom-2 right-2">
-                                    <label class="cursor-pointer bg-black/75 hover:bg-amber-600 text-white text-xs px-2.5 py-1.5 rounded-lg backdrop-blur-sm transition flex items-center gap-1 shadow">
-                                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
-                                        <span>更換肖像</span>
-                                        <input type="file" accept="image/*" class="hidden" onchange="loadCustomImage(event, 'escher-portrait-img', 'escher-svg-fallback')">
-                                    </label>
                                 </div>
                             </div>
 
@@ -353,12 +347,6 @@
                                             <p class="text-xs text-stone-300 mb-3">石版畫原作 (334 × 385 mm)</p>
                                             <a href="https://printondemand.mcescher.com/shop/m-c-escher-reptiles/" target="_blank" rel="noopener noreferrer" class="px-3 py-1.5 bg-amber-600 text-white rounded-lg text-xs font-bold">點此開啟官方原圖</a>
                                         </div>
-                                        <div class="absolute bottom-2 right-2">
-                                            <label class="cursor-pointer bg-black/75 hover:bg-amber-600 text-white text-[11px] px-2 py-1 rounded backdrop-blur-sm transition flex items-center gap-1 shadow">
-                                                <span>載入原作圖檔</span>
-                                                <input type="file" accept="image/*" class="hidden" onchange="loadCustomImage(event, 'escher-orig-print-img', 'escher-print-svg-fallback')">
-                                            </label>
-                                        </div>
                                     </div>
                                     <div class="mt-2.5 text-[11px] text-stone-300 leading-snug">
                                         <div class="font-bold text-amber-300">▲ 艾雪石版畫原作《Reptiles》(1943)</div>
@@ -404,19 +392,197 @@
                     </div>
                 </div>
 
-                <!-- Middle Section: Dual Artwork Showcase (Exact Geometry matching image_86bbe3.jpg & image_86b804.jpg) -->
+                <!-- Section 2: Original Lizard Cutting Method Explanation + Interactive 6-Step Cutting Blueprint & FLA Tool (Placed ABOVE Comparison Showcase) -->
+                <div class="bg-stone-900 text-stone-100 rounded-2xl p-6 sm:p-8 shadow-xl border border-stone-700 space-y-7">
+                    
+                    <!-- Step 2A: Detailed Explanation of Original Lizard Hexagon Cutting Method -->
+                    <div class="space-y-4 border-b border-stone-700 pb-6">
+                        <div class="flex flex-col md:flex-row md:items-center justify-between gap-3">
+                            <div>
+                                <span class="inline-block text-xs font-bold uppercase tracking-wider bg-amber-500/20 text-amber-300 border border-amber-400/30 px-3 py-1 rounded-full mb-2">
+                                    Part 1 • 原始蜥蜴幾何切割原理解析
+                                </span>
+                                <h3 class="text-xl sm:text-2xl font-bold text-white serif-text">
+                                    原始蜥蜴的切割方式：正六邊形「相鄰邊配對與 120° 旋轉對稱」
+                                </h3>
+                            </div>
+                            <button onclick="switchTab('page2')" class="shrink-0 inline-flex items-center justify-center gap-2 bg-amber-500 hover:bg-amber-400 text-stone-950 font-bold px-4 py-2 rounded-xl shadow transition text-xs sm:text-sm">
+                                <span>前往第二頁：觀看六步動態旋轉分解</span>
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"></path></svg>
+                            </button>
+                        </div>
+
+                        <p class="text-stone-300 text-sm sm:text-base leading-relaxed">
+                            艾雪《蜥蜴》鑲嵌的每一隻蜥蜴，皆是由一個<strong>尖頂正六邊形（頂點依順時針標記為 <span class="math-var">V</span><sub>0</sub> ～ <span class="math-var">V</span><sub>5</sub>）</strong>透過<strong>「等面積挖補（有減必有加）」</strong>變形而來。其核心幾何法則為：選取正六邊形中<strong>三個互不相鄰的頂點 <span class="math-var">V</span><sub>5</sub>（左臉頰）、<span class="math-var">V</span><sub>1</sub>（右後膝）、<span class="math-var">V</span><sub>3</sub>（下後腳趾）作為 120° 旋轉中心</strong>，將正六邊形的 6 條邊兩兩配對，分成三大群組共 <strong>6 個切割步驟</strong>：
+                        </p>
+
+                        <!-- 3 Pivot Groups Cards -->
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 pt-1">
+                            <!-- Pivot V5 -->
+                            <div class="bg-stone-800/90 border border-red-500/40 rounded-xl p-4 space-y-2">
+                                <div class="flex items-center justify-between">
+                                    <span class="text-xs font-bold bg-red-500/20 text-red-300 border border-red-400/30 px-2.5 py-0.5 rounded-full">第一組旋轉中心：<span class="math-var">V</span><sub>5</sub></span>
+                                    <span class="text-xs text-stone-400 font-mono">左邊 <span class="math-var">V</span><sub>4</sub><span class="math-var">V</span><sub>5</sub> ↔ 左上邊 <span class="math-var">V</span><sub>5</sub><span class="math-var">V</span><sub>0</sub></span>
+                                </div>
+                                <div class="text-sm font-bold text-amber-300">塑造「尖吻頭部」與「左前手掌」</div>
+                                <ul class="text-xs text-stone-300 space-y-1.5 leading-relaxed">
+                                    <li>• <strong>步驟 1（紅 C₁）</strong>：於左邊上半部（左頸凹槽）向內挖除多邊形，繞 <span class="math-var">V</span><sub>5</sub> <strong>逆時針轉 120°（−120°）</strong>補至左上邊外側，形成<strong>蜥蜴頭部</strong>。</li>
+                                    <li>• <strong>步驟 4（橘 C₄）</strong>：於左上邊下半部（右頸與右臂內側）向內挖除多邊形，繞 <span class="math-var">V</span><sub>5</sub> <strong>順時針轉 120°（+120°）</strong>補至左邊下半部外側，形成<strong>左前手掌</strong>。</li>
+                                </ul>
+                            </div>
+
+                            <!-- Pivot V1 -->
+                            <div class="bg-stone-800/90 border border-blue-500/40 rounded-xl p-4 space-y-2">
+                                <div class="flex items-center justify-between">
+                                    <span class="text-xs font-bold bg-blue-500/20 text-blue-300 border border-blue-400/30 px-2.5 py-0.5 rounded-full">第二組旋轉中心：<span class="math-var">V</span><sub>1</sub></span>
+                                    <span class="text-xs text-stone-400 font-mono">右上邊 <span class="math-var">V</span><sub>0</sub><span class="math-var">V</span><sub>1</sub> ↔ 右邊 <span class="math-var">V</span><sub>1</sub><span class="math-var">V</span><sub>2</sub></span>
+                                </div>
+                                <div class="text-sm font-bold text-amber-300">塑造「左後腳掌」與「高舉右前手」</div>
+                                <ul class="text-xs text-stone-300 space-y-1.5 leading-relaxed">
+                                    <li>• <strong>步驟 2（藍 C₂）</strong>：於右上邊下半部（右腋下與腰側）向內挖除靴形區塊，繞 <span class="math-var">V</span><sub>1</sub> <strong>逆時針轉 120°（−120°）</strong>補至右邊上半部外側，形成<strong>向右蹬出的後腳掌</strong>。</li>
+                                    <li>• <strong>步驟 5（紫 C₅）</strong>：於右邊下半部向內挖除三角形，繞 <span class="math-var">V</span><sub>1</sub> <strong>順時針轉 120°（+120°）</strong>補至右上邊頂端外側，形成<strong>高舉的右前手掌</strong>。</li>
+                                </ul>
+                            </div>
+
+                            <!-- Pivot V3 -->
+                            <div class="bg-stone-800/90 border border-emerald-500/40 rounded-xl p-4 space-y-2">
+                                <div class="flex items-center justify-between">
+                                    <span class="text-xs font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-400/30 px-2.5 py-0.5 rounded-full">第三組旋轉中心：<span class="math-var">V</span><sub>3</sub></span>
+                                    <span class="text-xs text-stone-400 font-mono">右下邊 <span class="math-var">V</span><sub>2</sub><span class="math-var">V</span><sub>3</sub> ↔ 左下邊 <span class="math-var">V</span><sub>3</sub><span class="math-var">V</span><sub>4</sub></span>
+                                </div>
+                                <div class="text-sm font-bold text-amber-300">塑造「下後腳掌」與「彎曲長尾巴」</div>
+                                <ul class="text-xs text-stone-300 space-y-1.5 leading-relaxed">
+                                    <li>• <strong>步驟 3（綠 C₃）</strong>：於右下邊下半部（大腿內側）向內挖除多邊形，繞 <span class="math-var">V</span><sub>3</sub> <strong>逆時針轉 120°（−120°）</strong>補至左下邊下半部外側，形成<strong>向左下伸展的後腳掌</strong>。</li>
+                                    <li>• <strong>步驟 6（青 C₆）</strong>：於左下邊上半部（左腰腹凹槽）向內挖除多邊形，繞 <span class="math-var">V</span><sub>3</sub> <strong>順時針轉 120°（+120°）</strong>補至右下邊上半部外側，形成<strong>彎曲長尾巴</strong>。</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Step 2B: Interactive Cutting Blueprint Diagram, Vertex Fine-Tuning Tool & Original FLA (350x210-2.xfl) Reference -->
+                    <div class="bg-stone-800/90 rounded-2xl p-5 sm:p-6 border border-amber-500/40 space-y-5">
+                        <div class="flex flex-col md:flex-row md:items-center justify-between gap-3 border-b border-stone-700 pb-3">
+                            <div>
+                                <span class="text-xs font-bold text-amber-300 uppercase tracking-wider">Part 2 • Cutting Blueprint, Interactive Vertex Fine-Tuner & FLA Reference</span>
+                                <h4 class="text-lg sm:text-xl font-bold text-white serif-text mt-0.5">
+                                    📐 蜥蜴正六邊形「六步切割示意圖」與頂點互動細修工具
+                                </h4>
+                                <p class="text-xs sm:text-sm text-stone-300 mt-1">
+                                    下圖完整標示正六邊形頂點 <span class="math-var">V</span><sub>0</sub> ～ <span class="math-var">V</span><sub>5</sub> 與步驟 1 ～ 6 的<strong>「內部挖除區（彩色虛線）」</strong>與<strong>「繞頂點旋轉 120° 補出區（彩色實線）」</strong>。直接<strong>用滑鼠拖曳圖上的編號圓點</strong>即可即時細修蜥蜴外框，並於<strong>正下方的「原始外框與三色著色成果對照」即時看到鑲嵌變化</strong>！
+                                </p>
+                            </div>
+                            <div class="flex flex-wrap items-center gap-2 shrink-0">
+                                <button onclick="resetCustomLizardPts()" class="px-3 py-1.5 rounded-lg bg-stone-700 hover:bg-stone-600 text-stone-200 text-xs font-bold transition">
+                                    ↺ 還原預設座標
+                                </button>
+                                <button onclick="copyCustomLizardJSON()" class="px-3 py-1.5 rounded-lg bg-amber-500 hover:bg-amber-400 text-stone-950 text-xs font-bold transition shadow">
+                                    📋 複製目前微調座標數據
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+                            <!-- Left: Interactive Cutting Diagram SVG (7 cols) -->
+                            <div class="lg:col-span-7 flex flex-col items-center">
+                                <div class="w-full max-w-xl aspect-square bg-white rounded-xl border-2 border-amber-400 shadow-xl overflow-hidden relative">
+                                    <!-- Optional FLA / Reference Image Underlay for Precision Tracing -->
+                                    <img id="bp-underlay-img" src="image_846362.jpg" alt="蜥蜴參考底圖" class="hidden absolute inset-0 w-full h-full object-contain opacity-35 pointer-events-none select-none" onerror="this.classList.add('hidden')">
+                                    <svg id="cutting-blueprint-svg" viewBox="-165 -155 330 310" class="w-full h-full relative z-10 select-none touch-none"></svg>
+                                    <div id="blueprint-copy-toast" class="hidden absolute top-3 right-3 z-20 bg-emerald-700 text-white text-xs font-bold px-3 py-1.5 rounded-lg shadow">
+                                        ✅ 已複製微調後的頂點座標！
+                                    </div>
+                                </div>
+                                <div class="flex flex-wrap items-center justify-center gap-4 mt-3 text-xs text-stone-300">
+                                    <label class="flex items-center gap-1.5 cursor-pointer">
+                                        <input type="checkbox" id="bp-toggle-in" checked onchange="renderCuttingBlueprint()" class="accent-amber-500">
+                                        <span>顯示內部挖除塊（虛線）</span>
+                                    </label>
+                                    <label class="flex items-center gap-1.5 cursor-pointer">
+                                        <input type="checkbox" id="bp-toggle-out" checked onchange="renderCuttingBlueprint()" class="accent-amber-500">
+                                        <span>顯示旋轉補出塊（實線色塊）</span>
+                                    </label>
+                                    <label class="flex items-center gap-1.5 cursor-pointer">
+                                        <input type="checkbox" id="bp-toggle-handles" checked onchange="renderCuttingBlueprint()" class="accent-amber-500">
+                                        <span>顯示可拖曳微調控制點</span>
+                                    </label>
+                                </div>
+                            </div>
+
+                            <!-- Right: Legend, Original FLA Archive Reference & Coordinate Inspector (5 cols) -->
+                            <div class="lg:col-span-5 space-y-3 text-xs text-stone-200">
+                                <!-- Original FLA (350x210-2.xfl) Reference & Download Card -->
+                                <div class="bg-gradient-to-br from-amber-950/90 via-stone-900 to-stone-900 p-4 rounded-xl border border-amber-500/50 space-y-2.5 shadow-md">
+                                    <div class="flex items-center justify-between gap-2">
+                                        <div class="font-bold text-amber-300 text-sm flex items-center gap-1.5">
+                                            <span>📦 原始蜥蜴 Flash 專案檔（FLA / XFL）參考</span>
+                                        </div>
+                                        <span class="text-[11px] bg-amber-500/20 text-amber-200 px-2 py-0.5 rounded font-mono">350x210-2.xfl</span>
+                                    </div>
+                                    <p class="text-stone-300 leading-relaxed text-[11px] sm:text-xs">
+                                        原始動畫專案檔（Adobe Flash CS5.1 XFL 封裝格式，尺寸 <code>350×210</code>）內含完整切割圖層與 4 色蜥蜴貼圖元件（<code>LIBRARY/01-s.png ～ 04-s.png</code>、<code>img1-s ～ img4-s.xml</code>、<code>元件 1.xml ～ 58.xml</code> 及 <code>frame (50).xml</code>），提供細修頂點與操作對照參考：
+                                    </p>
+                                    <div class="flex flex-wrap items-center gap-2 pt-1">
+                                        <button onclick="downloadOriginalFlaReference()" class="px-3 py-1.5 rounded-lg bg-amber-500 hover:bg-amber-400 text-stone-950 font-bold text-xs shadow transition flex items-center gap-1">
+                                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                                            <span>下載原始蜥蜴 FLA 檔 (350x210-2.fla)</span>
+                                        </button>
+                                        <button onclick="document.getElementById('fla-structure-modal').classList.toggle('hidden')" class="px-2.5 py-1.5 rounded-lg bg-stone-800 hover:bg-stone-700 text-amber-200 border border-amber-500/30 font-semibold text-xs transition">
+                                            🔍 檢視 FLA 元件庫結構
+                                        </button>
+                                    </div>
+                                    <!-- Collapsible FLA Library Inspector -->
+                                    <div id="fla-structure-modal" class="hidden mt-2 pt-2 border-t border-stone-700 text-[11px] text-stone-300 font-mono space-y-1 bg-stone-950/80 p-2.5 rounded-lg">
+                                        <div class="text-amber-300 font-sans font-bold">📂 350x210-2.fla (XFL 內部元件庫結構)：</div>
+                                        <div>• DOMDocument.xml (主時間軸與六步切割動畫腳本)</div>
+                                        <div>• LIBRARY/01-s.png, 02-s.png (02-new.png), 03-s.png, 04-s.png (蜥蜴著色貼圖)</div>
+                                        <div>• LIBRARY/img1-s.xml ～ img4-s.xml (蜥蜴圖像元件封裝)</div>
+                                        <div>• LIBRARY/1.xml ～ 58.xml (正六邊形六步裁切塊與旋轉補塊向量路徑)</div>
+                                        <div>• LIBRARY/frame.xml, (50).xml, (703).xml (外框與密鋪群組元件)</div>
+                                    </div>
+                                </div>
+
+                                <!-- 6-Step Color Legend -->
+                                <div class="bg-stone-900/90 p-3.5 rounded-xl border border-stone-700 space-y-2">
+                                    <div class="font-bold text-amber-300 text-sm">🎨 六步切割區塊色碼對照說明：</div>
+                                    <div class="grid grid-cols-1 gap-1.5">
+                                        <div class="flex items-center gap-2"><span class="w-3.5 h-3.5 rounded bg-red-500 inline-block shrink-0"></span><span><strong>步驟 1（紅 C₁）</strong>：左頸凹槽挖除 <span class="text-amber-300 font-semibold">―(繞 <span class="math-var">V</span><sub>5</sub> 轉 −120°)→</span> 尖吻頭部</span></div>
+                                        <div class="flex items-center gap-2"><span class="w-3.5 h-3.5 rounded bg-blue-500 inline-block shrink-0"></span><span><strong>步驟 2（藍 C₂）</strong>：右腋下挖除 <span class="text-amber-300 font-semibold">―(繞 <span class="math-var">V</span><sub>1</sub> 轉 −120°)→</span> 左後腳掌（向右下）</span></div>
+                                        <div class="flex items-center gap-2"><span class="w-3.5 h-3.5 rounded bg-emerald-500 inline-block shrink-0"></span><span><strong>步驟 3（綠 C₃）</strong>：大腿內側挖除 <span class="text-amber-300 font-semibold">―(繞 <span class="math-var">V</span><sub>3</sub> 轉 −120°)→</span> 右後腳掌（向左下）</span></div>
+                                        <div class="flex items-center gap-2"><span class="w-3.5 h-3.5 rounded bg-orange-500 inline-block shrink-0"></span><span><strong>步驟 4（橘 C₄）</strong>：右頸與右臂內側挖除 <span class="text-amber-300 font-semibold">―(繞 <span class="math-var">V</span><sub>5</sub> 轉 +120°)→</span> 左前手掌</span></div>
+                                        <div class="flex items-center gap-2"><span class="w-3.5 h-3.5 rounded bg-purple-500 inline-block shrink-0"></span><span><strong>步驟 5（紫 C₅）</strong>：右邊下半三角挖除 <span class="text-amber-300 font-semibold">―(繞 <span class="math-var">V</span><sub>1</sub> 轉 +120°)→</span> 高舉的右前手掌</span></div>
+                                        <div class="flex items-center gap-2"><span class="w-3.5 h-3.5 rounded bg-teal-400 inline-block shrink-0"></span><span><strong>步驟 6（青 C₆）</strong>：左腰腹挖除 <span class="text-amber-300 font-semibold">―(繞 <span class="math-var">V</span><sub>3</sub> 轉 +120°)→</span> 彎曲長尾巴</span></div>
+                                    </div>
+                                </div>
+
+                                <!-- Live Coordinate Inspector -->
+                                <div class="bg-stone-900/90 p-3.5 rounded-xl border border-stone-700 space-y-2">
+                                    <div class="flex items-center justify-between">
+                                        <span class="font-bold text-amber-300 text-sm">🔧 即時頂點座標檢視器 (R = 100)：</span>
+                                        <span id="bp-active-pt-label" class="text-amber-400 font-mono">請拖曳左側控制點</span>
+                                    </div>
+                                    <textarea id="bp-coords-textarea" rows="5" readonly class="w-full bg-stone-950 text-emerald-300 font-mono text-[11px] p-2.5 rounded-lg border border-stone-700 focus:outline-none"></textarea>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Section 3: Dual Artwork Showcase (Placed right below the Cutting Blueprint so changes are immediately visible!) -->
                 <div class="bg-stone-50 border border-stone-200 rounded-2xl p-5 sm:p-7 shadow-inner space-y-6">
                     <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-stone-200 pb-4">
                         <div>
+                            <div class="inline-flex items-center gap-1.5 text-xs font-bold text-amber-800 bg-amber-100 border border-amber-300 px-2.5 py-0.5 rounded-full mb-1">
+                                <span>⚡ 與上方「六步切割細修工具」即時連動</span>
+                            </div>
                             <h3 class="text-xl sm:text-2xl font-bold text-stone-800 serif-text">
                                 「蜥蜴」鑲嵌原始外框與三色著色成果對照
                             </h3>
                             <p class="text-sm text-stone-600 mt-1">
-                                依據許志農教授與沈玟妤同學設計之六步旋轉座標精確繪製（亦可點擊右方按鈕載入本機原圖檔或切換方向）
+                                依據上方正六邊形六步旋轉座標即時演算繪製——當您在上方拖曳控制點細修蜥蜴外框時，下方的黑白線稿與三色鑲嵌將即時同步更新！
                             </p>
                         </div>
 
-                        <!-- View Mode, Orientation & Custom File Upload Controls -->
+                        <!-- View Mode & Orientation Controls (Removed image replacement buttons per instruction) -->
                         <div class="flex flex-wrap items-center gap-2">
                             <div class="inline-flex rounded-lg bg-stone-200 p-1">
                                 <button id="mode-side-btn" onclick="setDisplayMode('side')" class="px-3 py-1.5 rounded-md text-xs sm:text-sm font-semibold bg-white text-amber-800 shadow transition">
@@ -430,15 +596,6 @@
                             <button id="orient-toggle-btn" onclick="togglePage1Orientation()" class="px-3 py-2 rounded-lg text-xs sm:text-sm font-medium bg-white border border-stone-300 hover:bg-stone-100 text-stone-700 transition">
                                 🔄 切換版面方向（橫向圖檔 / 影片方向）
                             </button>
-
-                            <label class="cursor-pointer bg-amber-100 hover:bg-amber-200 text-amber-900 border border-amber-300 text-xs sm:text-sm font-medium px-3 py-2 rounded-lg transition flex items-center gap-1.5">
-                                <span>載入線稿圖</span>
-                                <input type="file" accept="image/*" class="hidden" onchange="uploadArtworkFile(event, 'outline')">
-                            </label>
-                            <label class="cursor-pointer bg-amber-100 hover:bg-amber-200 text-amber-900 border border-amber-300 text-xs sm:text-sm font-medium px-3 py-2 rounded-lg transition flex items-center gap-1.5">
-                                <span>載入著色圖</span>
-                                <input type="file" accept="image/*" class="hidden" onchange="uploadArtworkFile(event, 'colored')">
-                            </label>
                         </div>
                     </div>
 
@@ -447,7 +604,6 @@
                         <!-- Left Card: Original Black & White Outline with Double Orange/Brown Frame -->
                         <div class="flex flex-col bg-white p-3 rounded-xl shadow-md border border-stone-200">
                             <div class="relative w-full aspect-[4/3] rounded-lg overflow-hidden bg-white" id="card-outline-container">
-                                <img id="user-outline-img" src="image_86bbe3.jpg" class="w-full h-full object-contain hidden" onload="showLoadedImg('outline')" onerror="this.classList.add('hidden')">
                                 <div id="svg-outline-showcase" class="w-full h-full"></div>
                             </div>
                             <div class="mt-3 flex items-center justify-between px-1">
@@ -459,7 +615,6 @@
                         <!-- Right Card: Three-Color Lizard Tessellation -->
                         <div class="flex flex-col bg-white p-3 rounded-xl shadow-md border border-stone-200">
                             <div class="relative w-full aspect-[4/3] rounded-lg overflow-hidden bg-white" id="card-colored-container">
-                                <img id="user-colored-img" src="image_86b804.jpg" class="w-full h-full object-contain hidden" onload="showLoadedImg('colored')" onerror="this.classList.add('hidden')">
                                 <div id="svg-colored-showcase" class="w-full h-full"></div>
                             </div>
                             <div class="mt-3 flex items-center justify-between px-1">
@@ -488,10 +643,8 @@
                     </div>
                 </div>
 
-                <!-- Single Video Showcase & Cutting Diagram / Fine-Tuning Section -->
-                <div class="bg-stone-900 text-stone-100 rounded-2xl p-6 sm:p-8 shadow-xl border border-stone-700 space-y-8">
-                    
-                    <!-- Top Part: Single Featured Exhibition Video (HOoCEwvv7bU) with Multi-Mode Smooth Playback -->
+                <!-- Section 4: Single Video Showcase (HOoCEwvv7bU) -->
+                <div class="bg-stone-900 text-stone-100 rounded-2xl p-6 sm:p-8 shadow-xl border border-stone-700 space-y-6">
                     <div class="space-y-4">
                         <div class="flex flex-col md:flex-row md:items-center justify-between gap-3 border-b border-stone-700 pb-4">
                             <div>
@@ -586,79 +739,6 @@
                             </div>
                         </div>
                     </div>
-
-                    <!-- Bottom Part: Interactive Cutting Blueprint Diagram & Vertex Fine-Tuning Tool (切割示意圖與頂點微調器) -->
-                    <div class="bg-stone-800/90 rounded-2xl p-5 sm:p-6 border border-amber-500/40 space-y-5">
-                        <div class="flex flex-col md:flex-row md:items-center justify-between gap-3 border-b border-stone-700 pb-3">
-                            <div>
-                                <span class="text-xs font-bold text-amber-300 uppercase tracking-wider">Cutting Blueprint & Interactive Vertex Fine-Tuner</span>
-                                <h4 class="text-lg sm:text-xl font-bold text-white serif-text mt-0.5">
-                                    📐 蜥蜴正六邊形「六步切割示意圖」與頂點互動細修工具
-                                </h4>
-                                <p class="text-xs sm:text-sm text-stone-300 mt-1">
-                                    下圖完整標示正六邊形頂點 <span class="math-var">V</span><sub>0</sub> ～ <span class="math-var">V</span><sub>5</sub> 與步驟 1 ～ 6 的<strong>「內部挖除區（彩色虛線）」</strong>與<strong>「繞頂點旋轉 120° 補出區（彩色實線）」</strong>。您可直接<strong>用滑鼠拖曳圖上的編號圓點</strong>即時細修蜥蜴外框，全站所有蜥蜴會自動同步更新並保持 <strong>100%</strong> 無縫密合！
-                                </p>
-                            </div>
-                            <div class="flex flex-wrap items-center gap-2 shrink-0">
-                                <button onclick="resetCustomLizardPts()" class="px-3 py-1.5 rounded-lg bg-stone-700 hover:bg-stone-600 text-stone-200 text-xs font-bold transition">
-                                    ↺ 還原預設座標
-                                </button>
-                                <button onclick="copyCustomLizardJSON()" class="px-3 py-1.5 rounded-lg bg-amber-500 hover:bg-amber-400 text-stone-950 text-xs font-bold transition shadow">
-                                    📋 複製目前微調座標數據
-                                </button>
-                            </div>
-                        </div>
-
-                        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-center">
-                            <!-- Left: Interactive Cutting Diagram SVG (7 cols) -->
-                            <div class="lg:col-span-7 flex flex-col items-center">
-                                <div class="w-full max-w-xl aspect-square bg-white rounded-xl border-2 border-amber-400 shadow-xl overflow-hidden relative">
-                                    <svg id="cutting-blueprint-svg" viewBox="-165 -155 330 310" class="w-full h-full select-none touch-none"></svg>
-                                    <div id="blueprint-copy-toast" class="hidden absolute top-3 right-3 bg-emerald-700 text-white text-xs font-bold px-3 py-1.5 rounded-lg shadow">
-                                        ✅ 已複製微調後的頂點座標！
-                                    </div>
-                                </div>
-                                <div class="flex flex-wrap items-center justify-center gap-4 mt-3 text-xs text-stone-300">
-                                    <label class="flex items-center gap-1.5 cursor-pointer">
-                                        <input type="checkbox" id="bp-toggle-in" checked onchange="renderCuttingBlueprint()" class="accent-amber-500">
-                                        <span>顯示內部挖除塊（虛線）</span>
-                                    </label>
-                                    <label class="flex items-center gap-1.5 cursor-pointer">
-                                        <input type="checkbox" id="bp-toggle-out" checked onchange="renderCuttingBlueprint()" class="accent-amber-500">
-                                        <span>顯示旋轉補出塊（實線色塊）</span>
-                                    </label>
-                                    <label class="flex items-center gap-1.5 cursor-pointer">
-                                        <input type="checkbox" id="bp-toggle-handles" checked onchange="renderCuttingBlueprint()" class="accent-amber-500">
-                                        <span>顯示可拖曳微調控制點</span>
-                                    </label>
-                                </div>
-                            </div>
-
-                            <!-- Right: Legend & Coordinate Inspector (5 cols) -->
-                            <div class="lg:col-span-5 space-y-3 text-xs text-stone-200">
-                                <div class="bg-stone-900/90 p-3.5 rounded-xl border border-stone-700 space-y-2">
-                                    <div class="font-bold text-amber-300 text-sm">🎨 六步切割區塊色碼對照說明：</div>
-                                    <div class="grid grid-cols-1 gap-1.5">
-                                        <div class="flex items-center gap-2"><span class="w-3.5 h-3.5 rounded bg-red-500 inline-block shrink-0"></span><span><strong>步驟 1（紅 C₁）</strong>：左頸凹槽挖除 <span class="text-amber-300 font-semibold">―(繞 <span class="math-var">V</span><sub>5</sub> 轉 −120°)→</span> 尖吻頭部</span></div>
-                                        <div class="flex items-center gap-2"><span class="w-3.5 h-3.5 rounded bg-blue-500 inline-block shrink-0"></span><span><strong>步驟 2（藍 C₂）</strong>：右腋下挖除 <span class="text-amber-300 font-semibold">―(繞 <span class="math-var">V</span><sub>1</sub> 轉 −120°)→</span> 左後腳掌（向右下）</span></div>
-                                        <div class="flex items-center gap-2"><span class="w-3.5 h-3.5 rounded bg-emerald-500 inline-block shrink-0"></span><span><strong>步驟 3（綠 C₃）</strong>：大腿內側挖除 <span class="text-amber-300 font-semibold">―(繞 <span class="math-var">V</span><sub>3</sub> 轉 −120°)→</span> 右後腳掌（向左下）</span></div>
-                                        <div class="flex items-center gap-2"><span class="w-3.5 h-3.5 rounded bg-orange-500 inline-block shrink-0"></span><span><strong>步驟 4（橘 C₄）</strong>：右頸與右臂內側挖除 <span class="text-amber-300 font-semibold">―(繞 <span class="math-var">V</span><sub>5</sub> 轉 +120°)→</span> 左前手掌</span></div>
-                                        <div class="flex items-center gap-2"><span class="w-3.5 h-3.5 rounded bg-purple-500 inline-block shrink-0"></span><span><strong>步驟 5（紫 C₅）</strong>：右邊下半三角挖除 <span class="text-amber-300 font-semibold">―(繞 <span class="math-var">V</span><sub>1</sub> 轉 +120°)→</span> 高舉的右前手掌</span></div>
-                                        <div class="flex items-center gap-2"><span class="w-3.5 h-3.5 rounded bg-teal-400 inline-block shrink-0"></span><span><strong>步驟 6（青 C₆）</strong>：左腰腹挖除 <span class="text-amber-300 font-semibold">―(繞 <span class="math-var">V</span><sub>3</sub> 轉 +120°)→</span> 彎曲長尾巴</span></div>
-                                    </div>
-                                </div>
-
-                                <div class="bg-stone-900/90 p-3.5 rounded-xl border border-stone-700 space-y-2">
-                                    <div class="flex items-center justify-between">
-                                        <span class="font-bold text-amber-300 text-sm">🔧 即時頂點座標檢視器 (R = 100)：</span>
-                                        <span id="bp-active-pt-label" class="text-amber-400 font-mono">請拖曳左側控制點</span>
-                                    </div>
-                                    <textarea id="bp-coords-textarea" rows="7" readonly class="w-full bg-stone-950 text-emerald-300 font-mono text-[11px] p-2.5 rounded-lg border border-stone-700 focus:outline-none"></textarea>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
                 </div>
 
             </div>
@@ -934,36 +1014,54 @@
             <!-- ================================================================= -->
             <div id="page3" class="tab-content space-y-6">
 
-                <!-- Top Intro & Rule Banner -->
-                <div class="bg-gradient-to-r from-amber-50 via-orange-50 to-amber-50 border border-amber-200 rounded-2xl p-5 sm:p-6 flex flex-col lg:flex-row lg:items-center justify-between gap-4 shadow-sm">
-                    <div class="space-y-1">
-                        <div class="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-amber-800 bg-amber-200/80 px-2.5 py-1 rounded-md">
-                            <span>Interactive 3-Coloring Challenge</span>
-                            <span>•</span>
-                            <span>同色不相鄰過關挑戰</span>
+                <!-- Top Intro & Rule Banner (With Clear Definition of Cycle Coloring) -->
+                <div class="bg-gradient-to-r from-amber-50 via-orange-50 to-amber-50 border border-amber-200 rounded-2xl p-5 sm:p-6 space-y-4 shadow-sm">
+                    <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+                        <div class="space-y-1">
+                            <div class="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-amber-800 bg-amber-200/80 px-2.5 py-1 rounded-md">
+                                <span>Interactive 3-Coloring Challenge</span>
+                                <span>•</span>
+                                <span>同色不相鄰過關挑戰</span>
+                            </div>
+                            <h2 class="text-2xl sm:text-3xl font-bold text-stone-900 serif-text">
+                                艾雪『蜥蜴』原始外框互動著色實驗室
+                            </h2>
+                            <p class="text-stone-600 text-sm sm:text-base">
+                                點選空白蜥蜴身體即可上色或切換顏色！將畫面中所有完整蜥蜴塗滿<strong class="text-red-600">紅</strong>、<strong class="text-amber-600">黃</strong>、<strong class="text-emerald-700">綠</strong>三色，且<strong>相鄰的蜥蜴皆不同色</strong>，即可觸發過關煙火秀！
+                            </p>
                         </div>
-                        <h2 class="text-2xl sm:text-3xl font-bold text-stone-900 serif-text">
-                            艾雪『蜥蜴』原始外框互動著色實驗室
-                        </h2>
-                        <p class="text-stone-600 text-sm sm:text-base">
-                            點選空白蜥蜴身體即可上色或切換顏色！將畫面中所有完整蜥蜴塗滿<strong class="text-red-600">紅</strong>、<strong class="text-amber-600">黃</strong>、<strong class="text-emerald-700">綠</strong>三色，且<strong>相鄰的蜥蜴皆不同色</strong>，即可觸發過關煙火秀！
-                        </p>
+
+                        <!-- Live Score & Status Badges -->
+                        <div class="flex flex-wrap items-center gap-3 shrink-0">
+                            <div class="bg-white border border-amber-300 rounded-xl px-4 py-2.5 shadow-sm text-center min-w-[120px]">
+                                <div class="text-xs text-stone-500 font-medium">已著色進度</div>
+                                <div id="game-progress-text" class="text-xl font-black text-amber-800 font-mono">0 / 14</div>
+                            </div>
+                            <div id="game-conflict-card" class="bg-white border border-stone-200 rounded-xl px-4 py-2.5 shadow-sm text-center min-w-[120px] transition">
+                                <div class="text-xs text-stone-500 font-medium">同色相鄰衝突</div>
+                                <div id="game-conflict-text" class="text-xl font-black text-emerald-600 font-mono">0 處</div>
+                            </div>
+                            <button onclick="toggleStageFullscreen()" class="bg-stone-900 hover:bg-amber-700 text-white font-bold px-4 py-3 rounded-xl shadow transition flex items-center gap-2 text-sm">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"></path></svg>
+                                <span>全螢幕著色模式</span>
+                            </button>
+                        </div>
                     </div>
 
-                    <!-- Live Score & Status Badges -->
-                    <div class="flex flex-wrap items-center gap-3 shrink-0">
-                        <div class="bg-white border border-amber-300 rounded-xl px-4 py-2.5 shadow-sm text-center min-w-[120px]">
-                            <div class="text-xs text-stone-500 font-medium">已著色進度</div>
-                            <div id="game-progress-text" class="text-xl font-black text-amber-800 font-mono">0 / 14</div>
+                    <!-- Explicit Explanation Box for Cycle Coloring (循環著色定義說明) -->
+                    <div class="bg-white/90 border border-amber-300/90 rounded-xl p-3.5 sm:p-4 flex flex-col md:flex-row md:items-center justify-between gap-3 text-xs sm:text-sm text-stone-700 shadow-sm">
+                        <div class="space-y-1">
+                            <div class="font-bold text-amber-950 flex items-center gap-1.5">
+                                <span class="text-base">🔄</span>
+                                <span>什麼是「循環著色（循環變色）」與「三色循環鑲嵌」？</span>
+                            </div>
+                            <p class="leading-relaxed text-stone-600">
+                                1. <strong>操作上的「循環變色」模式（預設）</strong>：無須頻繁移動滑鼠切換畫筆，只需<strong>重複點選同一隻蜥蜴的身體</strong>，該蜥蜴就會按照 
+                                <span class="inline-flex items-center gap-1 font-bold text-stone-800 bg-stone-100 px-2 py-0.5 rounded border border-stone-300">空白 ➔ <span class="text-red-600">🔴 紅蜥蜴</span> ➔ <span class="text-amber-600">🟡 黃蜥蜴</span> ➔ <span class="text-emerald-700">🟢 綠蜥蜴</span> ➔ 空白</span> 
+                                的固定順序循環變色（您也可改點選單色畫筆直接指定顏色）。<br>
+                                2. <strong>幾何上的「三色循環著色」定義</strong>：在艾雪正六邊形蜥蜴鑲嵌中，每個三方交會頂點（如頭、手、膝交會處）皆由 <strong>3 隻不同方向的蜥蜴</strong>繞中心每次旋轉 <strong>120°</strong> 緊密咬合而成；因此以<strong>紅、黃、綠三色依序循環配置</strong>，就能確保任意相鄰兩隻蜥蜴永遠不同色（同色不相鄰）！
+                            </p>
                         </div>
-                        <div id="game-conflict-card" class="bg-white border border-stone-200 rounded-xl px-4 py-2.5 shadow-sm text-center min-w-[120px] transition">
-                            <div class="text-xs text-stone-500 font-medium">同色相鄰衝突</div>
-                            <div id="game-conflict-text" class="text-xl font-black text-emerald-600 font-mono">0 處</div>
-                        </div>
-                        <button onclick="toggleStageFullscreen()" class="bg-stone-900 hover:bg-amber-700 text-white font-bold px-4 py-3 rounded-xl shadow transition flex items-center gap-2 text-sm">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"></path></svg>
-                            <span>全螢幕著色模式</span>
-                        </button>
                     </div>
                 </div>
 
@@ -1094,7 +1192,7 @@
                 原作：M. C. Escher《Reptiles》(1943) ｜ 繪圖著色：<strong class="text-amber-300">師大數學系 沈玟妤 設計</strong> ｜ 指導老師：<strong class="text-amber-300">許志農 教授</strong> ｜ 網頁製作：<strong class="text-amber-300">新北市林口國中 李政憲 老師</strong>
             </div>
             <div>
-                數學與藝術互動教學展示系統
+                數學與藝術互動教學展示系統（1117發佈版）
             </div>
         </footer>
     </div>
@@ -1893,6 +1991,50 @@
                 toast.classList.remove('hidden');
                 setTimeout(() => toast.classList.add('hidden'), 2200);
             }
+        }
+
+        /**
+         * Generates and downloads the original Lizard Flash XFL/FLA XML document & exact coordinate package
+         * (`350x210-2.fla` / `.xfl`) so teachers/designers have the original FLA reference structure & current vertices.
+         */
+        function downloadOriginalFlaReference() {
+            const data = getExactVideoLizardData(100);
+            const xflDomDocument = `<?xml version="1.0" encoding="UTF-8"?>
+<!-- Original Escher Lizard Flash CS5.1 XFL Project Reference (350x210-2.xfl) -->
+<!-- 繪圖著色：師大數學系 沈玟妤 設計 | 指導老師：許志農 教授 | 網頁製作：新北市林口國中 李政憲 老師 -->
+<DOMDocument xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://ns.adobe.com/xfl/2008/" width="350" height="210" frameRate="24" currentTimeline="1" xflVersion="2.1" creatorInfo="Adobe Flash Professional CS5.5">
+    <media>
+        <DOMBitmapItem name="01-s.png" sourceExternalFilepath="./LIBRARY/01-s.png"/>
+        <DOMBitmapItem name="02-s.png" sourceExternalFilepath="./LIBRARY/02-s.png"/>
+        <DOMBitmapItem name="02-new.png" sourceExternalFilepath="./LIBRARY/02-new.png"/>
+        <DOMBitmapItem name="03-s.png" sourceExternalFilepath="./LIBRARY/03-s.png"/>
+        <DOMBitmapItem name="04-s.png" sourceExternalFilepath="./LIBRARY/04-s.png"/>
+    </media>
+    <symbols>
+        <Include href="img1-s.xml" loadImmediate="false"/>
+        <Include href="img2-s.xml" loadImmediate="false"/>
+        <Include href="img3-s.xml" loadImmediate="false"/>
+        <Include href="img4-s.xml" loadImmediate="false"/>
+        <Include href="frame.xml" loadImmediate="false"/>
+        <Include href="(50).xml" loadImmediate="false"/>
+        <Include href="(703).xml" loadImmediate="false"/>
+    </symbols>
+    <!-- 蜥蜴正六邊形六步切割頂點座標數據 (R = 100) -->
+    <!--
+${JSON.stringify(customLizardMasterPts, null, 4)}
+    -->
+    <!-- 完整蜥蜴 SVG Path (R = 100): ${data.pathData} -->
+</DOMDocument>`;
+
+            const blob = new Blob([xflDomDocument], { type: 'application/vnd.adobe.xfl+xml;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = '350x210-2.fla';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
         }
 
         function initComparisonSlider() {
